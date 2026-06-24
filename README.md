@@ -1,1 +1,402 @@
-# etiquetas-cecotec
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Generador Etiquetas Cecotec</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f0f0f0; }
+
+@media screen {
+  .controls {
+    background: white;
+    padding: 14px 20px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: #666; font-weight: bold; }
+  .field input, .field select {
+    padding: 7px 9px; border: 1px solid #ccc; border-radius: 4px;
+    font-size: 13px; font-family: Arial, sans-serif;
+  }
+  .field input { width: 175px; }
+  .field select { width: 165px; }
+  .btn {
+    padding: 8px 14px; border: none; border-radius: 4px;
+    font-size: 13px; cursor: pointer; font-family: Arial, sans-serif; font-weight: bold;
+  }
+  .btn-add   { background: #222; color: white; }
+  .btn-add:hover   { background: #444; }
+  .btn-print { background: #e24b4a; color: white; }
+  .btn-print:hover { background: #c03a39; }
+  .btn-clear { background: #eee; color: #333; }
+  .btn-clear:hover { background: #ddd; }
+  .err { color: #e24b4a; font-size: 11px; padding: 3px 0; }
+
+  .info-bar {
+    background: #fffbea; border-bottom: 1px solid #f0e68c;
+    padding: 6px 20px; font-size: 12px; color: #7a6800;
+  }
+  .info-bar span { font-weight: bold; }
+
+  .queue-bar {
+    background: white; padding: 6px 20px;
+    border-bottom: 1px solid #eee; font-size: 12px; color: #555;
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center; min-height: 32px;
+  }
+  .queue-tag {
+    background: #f5f5f5; border: 1px solid #ddd; border-radius: 12px;
+    padding: 3px 10px; font-size: 11px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .queue-tag button { background: none; border: none; cursor: pointer; color: #999; font-size: 13px; line-height:1; padding:0; }
+  .queue-tag button:hover { color: #e24b4a; }
+  .sheet-wrap { display: flex; justify-content: center; padding: 24px; }
+}
+
+@media print {
+  .controls, .info-bar, .queue-bar { display: none !important; }
+  .sheet-wrap { padding: 0; display: block; }
+  body { background: white; }
+  @page { size: A4; margin: 0; }
+}
+
+/* ---- HOJA A4 ---- */
+#sheet {
+  background: white;
+  width: 210mm;
+  height: 297mm;
+  border: 2px dashed #e24b4a;
+  padding: 8mm 7mm;
+  display: grid;
+  overflow: hidden;
+}
+#sheet.layout-4  { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+#sheet.layout-6  { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+#sheet.layout-8  { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
+#sheet.layout-18 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(6, 1fr); }
+
+/* ---- CELDA BASE ---- */
+.lc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.3px solid #ddd;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== HORIZONTAL ===== */
+.lc.horiz {
+  flex-direction: column;
+  padding: 3mm 2mm;
+  gap: 1.5mm;
+}
+.lc.horiz .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; }
+.lc.horiz .lean { color: #000; font-family: Arial, sans-serif; text-align: center; }
+.lc.horiz .lbc  { width: 100%; display: flex; justify-content: center; }
+.lc.horiz .lbc svg { display: block; }
+
+/* tamaños horiz por layout */
+.layout-4  .lc.horiz .lref { font-size: 13pt; }
+.layout-4  .lc.horiz .lean { font-size: 10pt; }
+.layout-4  .lc.horiz .lbc svg { width: 82mm; height: 30mm; }
+
+.layout-6  .lc.horiz .lref { font-size: 11pt; }
+.layout-6  .lc.horiz .lean { font-size: 9pt; }
+.layout-6  .lc.horiz .lbc svg { width: 54mm; height: 24mm; }
+
+.layout-8  .lc.horiz .lref { font-size: 10pt; }
+.layout-8  .lc.horiz .lean { font-size: 8pt; }
+.layout-8  .lc.horiz .lbc svg { width: 82mm; height: 18mm; }
+
+.layout-18 .lc.horiz .lref { font-size: 8pt; }
+.layout-18 .lc.horiz .lean { font-size: 7pt; }
+.layout-18 .lc.horiz .lbc svg { width: 52mm; height: 14mm; }
+
+/* ===== VERTICAL ===== */
+/* El barcode se dibuja horizontalmente en un SVG ANCHO,
+   luego se rota 90° con CSS para que quede como una barra ALTA */
+.lc.verti {
+  flex-direction: row;
+  padding: 2mm 2mm;
+  gap: 2mm;
+}
+.lc.verti .lbc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* el contenedor tiene el tamaño del SVG rotado */
+}
+/* El SVG se rota: width se convierte en altura visual y viceversa */
+.lc.verti .lbc svg {
+  display: block;
+  transform: rotate(90deg);
+  transform-origin: center center;
+  flex-shrink: 0;
+}
+.lc.verti .ltext {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2mm;
+  flex: 1;
+  min-width: 0;
+}
+.lc.verti .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; }
+.lc.verti .lean { color: #000; font-family: Arial, sans-serif; word-break: break-all; }
+
+/* tamaños verti por layout:
+   SVG nativo width=ALTO_VISUAL height=ANCHO_VISUAL (se intercambian al rotar) */
+.layout-4 .lc.verti .lbc { width: 50mm; height: 100mm; }
+.layout-4 .lc.verti .lbc svg { width: 100mm; height: 50mm; margin: 0 -25mm; }
+.layout-4 .lc.verti .lref { font-size: 13pt; }
+.layout-4 .lc.verti .lean { font-size: 10pt; }
+
+.layout-6 .lc.verti .lbc { width: 38mm; height: 90mm; }
+.layout-6 .lc.verti .lbc svg { width: 90mm; height: 38mm; margin: 0 -26mm; }
+.layout-6 .lc.verti .lref { font-size: 11pt; }
+.layout-6 .lc.verti .lean { font-size: 9pt; }
+
+.layout-8 .lc.verti .lbc { width: 30mm; height: 55mm; }
+.layout-8 .lc.verti .lbc svg { width: 55mm; height: 30mm; margin: 0 -12.5mm; }
+.layout-8 .lc.verti .lref { font-size: 10pt; }
+.layout-8 .lc.verti .lean { font-size: 8pt; }
+
+.layout-18 .lc.verti .lbc { width: 16mm; height: 32mm; }
+.layout-18 .lc.verti .lbc svg { width: 32mm; height: 16mm; margin: 0 -8mm; }
+.layout-18 .lc.verti .lref { font-size: 7.5pt; }
+.layout-18 .lc.verti .lean { font-size: 6.5pt; }
+
+.ph { background: #fafafa; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <div class="field">
+    <label>REFERENCIA</label>
+    <input type="text" id="iref" placeholder="Ej: 08201-03" />
+  </div>
+  <div class="field">
+    <label>TIPO DE CÓDIGO</label>
+    <select id="itype" onchange="updateType()">
+      <option value="EAN13">EAN-13 (13 dígitos)</option>
+      <option value="ITF14">DUN-14 / ITF-14 (14 dígitos)</option>
+    </select>
+  </div>
+  <div class="field">
+    <label id="elbl">CÓDIGO EAN-13</label>
+    <input type="text" id="iean" placeholder="8447562411400" maxlength="14" />
+    <div class="err" id="eerr"></div>
+  </div>
+  <div class="field">
+    <label>CANTIDAD / LAYOUT</label>
+    <select id="iqty">
+      <option value="4">4 etiquetas (2×2)</option>
+      <option value="6">6 etiquetas (3×2)</option>
+      <option value="8">8 etiquetas (2×4)</option>
+      <option value="18" selected>18 etiquetas (3×6)</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>ORIENTACIÓN BARCODE</label>
+    <select id="iori">
+      <option value="horiz">↔ Horizontal</option>
+      <option value="verti">↕ Vertical</option>
+    </select>
+  </div>
+  <button class="btn btn-add" onclick="addLabel()">+ AÑADIR</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 IMPRIMIR / PDF</button>
+  <button class="btn btn-clear" onclick="clearAll()">🗑 LIMPIAR</button>
+</div>
+
+<div class="info-bar" id="ibar">Selecciona cantidad, orientación y añade etiquetas.</div>
+<div class="queue-bar" id="qbar"><span style="color:#aaa">Sin etiquetas aún</span></div>
+
+<div class="sheet-wrap">
+  <div id="sheet" class="layout-18"></div>
+</div>
+
+<script>
+var queue = [];
+var currentLayout = 18;
+var totalSlots = 18;
+
+// Parámetros JsBarcode según orientación y layout
+// En vertical: el SVG se dibuja "horizontal" con width=altoVisual height=anchoVisual
+// y luego CSS lo rota. Por eso height es el "ancho real" de las barras.
+var BC_PARAMS = {
+  horiz: {
+    4:  { w: 3.0, h: 90 },
+    6:  { w: 2.4, h: 72 },
+    8:  { w: 3.0, h: 55 },
+    18: { w: 1.7, h: 42 }
+  },
+  verti: {
+    4:  { w: 2.8, h: 150 },
+    6:  { w: 2.4, h: 114 },
+    8:  { w: 2.4, h: 83 },
+    18: { w: 1.5, h: 48 }
+  }
+};
+
+function updateType() {
+  var t = document.getElementById('itype').value;
+  document.getElementById('elbl').textContent = t === 'EAN13' ? 'CÓDIGO EAN-13' : 'CÓDIGO DUN-14/ITF-14';
+  document.getElementById('iean').placeholder = t === 'EAN13' ? '8447562411400' : '08447562411400';
+  document.getElementById('iean').maxLength = t === 'EAN13' ? 13 : 14;
+  document.getElementById('eerr').textContent = '';
+}
+
+function validate(code, type) {
+  if (type === 'EAN13') {
+    if (!/^\d{13}$/.test(code)) return 'EAN-13 debe tener exactamente 13 dígitos numéricos.';
+    var d = code.split('').map(Number);
+    var s = d.slice(0,12).reduce(function(a,v,i){ return a + v*(i%2===0?1:3); }, 0);
+    var c = (10 - s%10) % 10;
+    if (c !== d[12]) return 'Dígito de control incorrecto (debe ser ' + c + ').';
+  } else {
+    if (!/^\d{14}$/.test(code)) return 'DUN-14 debe tener exactamente 14 dígitos numéricos.';
+  }
+  return null;
+}
+
+function addLabel() {
+  var ref  = document.getElementById('iref').value.trim();
+  var ean  = document.getElementById('iean').value.trim();
+  var type = document.getElementById('itype').value;
+  var qty  = parseInt(document.getElementById('iqty').value);
+  var ori  = document.getElementById('iori').value;
+  var errEl = document.getElementById('eerr');
+
+  if (!ref) { alert('Introduce la referencia.'); return; }
+  if (!ean) { alert('Introduce el código EAN/DUN.'); return; }
+  var err = validate(ean, type);
+  if (err) { errEl.textContent = err; return; }
+  errEl.textContent = '';
+
+  if (queue.length === 0) {
+    currentLayout = qty;
+    totalSlots = qty;
+  } else if (qty !== currentLayout) {
+    alert('La hoja ya tiene layout de ' + currentLayout + ' etiquetas.\nLimpia primero para cambiar.');
+    return;
+  }
+
+  var used = queue.reduce(function(a,i){ return a+i.qty; }, 0);
+  if (used >= totalSlots) { alert('Hoja llena. Limpia primero.'); return; }
+
+  var actual = Math.min(qty, totalSlots - used);
+  queue.push({ ref: ref, ean: ean, type: type, qty: actual, ori: ori });
+  document.getElementById('iref').value = '';
+  document.getElementById('iean').value = '';
+  renderQueue();
+  renderSheet();
+}
+
+function removeItem(i) {
+  queue.splice(i, 1);
+  if (!queue.length) { currentLayout = parseInt(document.getElementById('iqty').value); totalSlots = currentLayout; }
+  renderQueue();
+  renderSheet();
+}
+
+function renderQueue() {
+  var bar  = document.getElementById('qbar');
+  var ibar = document.getElementById('ibar');
+  if (!queue.length) {
+    bar.innerHTML = '<span style="color:#aaa">Sin etiquetas aún</span>';
+    ibar.textContent = 'Selecciona cantidad, orientación y añade etiquetas.';
+    return;
+  }
+  var used = queue.reduce(function(a,i){ return a+i.qty; }, 0);
+  var cols = {4:2,6:3,8:2,18:3}[currentLayout];
+  var rows = currentLayout / cols;
+  ibar.innerHTML = 'Layout: <span>' + cols + ' col × ' + rows + ' fil = ' + currentLayout + ' etiquetas</span> &nbsp;·&nbsp; ' + used + '/' + currentLayout + ' ocupadas';
+  var html = '';
+  queue.forEach(function(it, idx) {
+    html += '<span class="queue-tag">' + it.ref + ' &nbsp;' + (it.ori==='verti'?'↕':'↔') + '&nbsp; ×' + it.qty +
+      ' <button onclick="removeItem(' + idx + ')">✕</button></span>';
+  });
+  bar.innerHTML = html;
+}
+
+function renderSheet() {
+  var sheet = document.getElementById('sheet');
+  sheet.innerHTML = '';
+  sheet.className = 'layout-' + currentLayout;
+
+  var labels = [];
+  queue.forEach(function(it) { for (var i=0;i<it.qty;i++) labels.push(it); });
+
+  for (var i=0; i<currentLayout; i++) {
+    var cell = document.createElement('div');
+
+    if (i < labels.length) {
+      var lb  = labels[i];
+      var ori = lb.ori;
+      var sid = 'bc' + i;
+      var p   = BC_PARAMS[ori][currentLayout];
+      cell.className = 'lc ' + ori;
+
+      if (ori === 'verti') {
+        cell.innerHTML =
+          '<div class="lbc"><svg id="' + sid + '"></svg></div>' +
+          '<div class="ltext">' +
+            '<div class="lref">' + lb.ref + '</div>' +
+            '<div class="lean">'  + lb.ean  + '</div>' +
+          '</div>';
+      } else {
+        cell.innerHTML =
+          '<div class="lref">' + lb.ref + '</div>' +
+          '<div class="lbc"><svg id="' + sid + '"></svg></div>' +
+          '<div class="lean">'  + lb.ean  + '</div>';
+      }
+
+      sheet.appendChild(cell);
+
+      (function(id, ean, type, params) {
+        try {
+          JsBarcode('#' + id, ean, {
+            format: type,
+            displayValue: false,
+            margin: 0,
+            width: params.w,
+            height: params.h,
+            background: '#ffffff',
+            lineColor: '#000000'
+          });
+        } catch(e) {
+          var el = document.getElementById(id);
+          if (el) el.outerHTML = '<span style="color:red;font-size:9px">Error barcode</span>';
+        }
+      })(sid, lb.ean, lb.type, p);
+
+    } else {
+      cell.className = 'lc ph';
+      sheet.appendChild(cell);
+    }
+  }
+}
+
+function clearAll() {
+  if (queue.length && !confirm('¿Limpiar toda la hoja?')) return;
+  queue = [];
+  currentLayout = parseInt(document.getElementById('iqty').value);
+  totalSlots = currentLayout;
+  renderQueue();
+  renderSheet();
+}
+
+renderSheet();
+</script>
+</body>
+</html>
