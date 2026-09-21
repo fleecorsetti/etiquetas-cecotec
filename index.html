@@ -354,12 +354,14 @@ function acSelectA4(i){
   var m = acA4Items[i];
   if(!m) return;
   document.getElementById('iref').value = m.ref;
-  /* Determinar qué código rellenar */
-  if(m.dun14 && m.dun14.length===14){
-    document.getElementById('itype').value = 'ITF14';
+  /* Respetar el tipo que el usuario tiene seleccionado */
+  var tipoActual = document.getElementById('itype').value;
+  if(tipoActual === 'ITF14' && m.dun14 && m.dun14.length===14){
     document.getElementById('iean').value = m.dun14;
-    updateType();
+  } else if(tipoActual === 'EAN13' && m.ean13){
+    document.getElementById('iean').value = m.ean13;
   } else if(m.ean13){
+    /* fallback: si no hay código para el tipo seleccionado, usar EAN13 */
     document.getElementById('itype').value = 'EAN13';
     document.getElementById('iean').value = m.ean13;
     updateType();
