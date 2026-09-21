@@ -104,7 +104,7 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
 }
 #roll-label .rl-bc {
   flex: 1; display: flex; align-items: center; justify-content: center;
-  overflow: hidden; padding: 0 3px;
+  overflow: hidden; padding: 0;
 }
 #roll-label .rl-bc svg { display: block; width: 100% !important; height: 100% !important; }
 #roll-label .rl-ean {
@@ -568,8 +568,8 @@ function renderRoll(){
     var codeToRender=(!err&&realEan)?realEan:'8447562411400';
     var typeToRender=(!err&&realEan)?cfg.type:'EAN13';
     var bcH=Math.round(hPx*0.80);
-    var bcW=Math.round(wPx*0.99);
-    var barW=Math.max(1.0,bcW/140);
+    var bcW=Math.round(wPx*1.00);
+    var barW=Math.max(1.0,bcW/120);
     try{
       JsBarcode('#rl-bc',codeToRender,{format:typeToRender,displayValue:false,margin:0,width:barW,height:bcH,background:'#fff',lineColor:'#000'});
       rlSvg.setAttribute('width',bcW+'px'); rlSvg.setAttribute('height',bcH+'px');
@@ -614,9 +614,9 @@ function downloadRollPDF(){
   var doc=new jsPDF({orientation:'portrait',unit:'mm',format:[pW,pH]});
   /* Trabajamos en el espacio rotado: el ancho útil es pH, el alto útil es pW */
   var rW=pH, rH=pW;
-  var mX=rW*0.01, mY=rH*0.01;
+  var mX=0, mY=rH*0.01;
   var innerW=rW-mX*2, innerH=rH-mY*2;
-  var refH=innerH*0.10; var eanH=innerH*0.10; var bcH=innerH*0.80; var bcW=innerW*0.99;
+  var refH=innerH*0.10; var eanH=innerH*0.10; var bcH=innerH*0.80; var bcW=innerW*1.00;
   var bcX=mX+(innerW-bcW)/2;
   var fsRef=Math.max(5,Math.min(12,rH*0.13));
   var fsEan=Math.max(4,Math.min(9,rH*0.10));
