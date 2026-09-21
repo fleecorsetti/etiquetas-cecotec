@@ -237,12 +237,8 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
       </div>
       <div class="roll-size-info" id="r-info"><b>Estándar EAN-13</b><br>70 × 55 mm · EAN-13 (13 dígitos)</div>
       <div class="field"><label id="r-elbl">CÓDIGO EAN-13</label><input type="text" id="r-ean" placeholder="8447562411400" maxlength="14" oninput="renderRoll()"/><div class="err" id="r-err"></div></div>
-      <div class="field"><label>ORIENTACIÓN BARCODE</label>
-        <select id="r-ori" onchange="renderRoll()">
-          <option value="horiz">↔ Horizontal</option>
-          <option value="verti">↕ Vertical (todo rotado)</option>
-        </select>
-      </div>
+      <!-- Orientación fija horizontal en pantalla; el PDF rota 90° para Zebra -->
+      <input type="hidden" id="r-ori" value="horiz"/>
       <div class="field"><label>COPIAS A IMPRIMIR</label>
         <input type="number" id="r-copies" value="1" min="1" max="999" style="width:100px;"/>
       </div>
@@ -610,28 +606,33 @@ function downloadRollPDF(){
   if(!ean){alert('Introduce el código.');return;}
   var err=validate(ean,cfg.type);if(err){errEl.textContent=err;return;}errEl.textContent='';
   var {jsPDF}=window.jspdf;
+  /* Para Zebra: el PDF tiene el tamaño físico de la etiqueta en portrait
+     pero el contenido se rota 90° dentro de la página porque la Zebra
+     interpreta el eje largo como vertical — así lo que se ve horizontal
+     en pantalla sale horizontal al salir del rollo. */
   var pW=cfg.w, pH=cfg.h;
   var doc=new jsPDF({orientation:'portrait',unit:'mm',format:[pW,pH]});
-  var mX=pW*0.02, mY=pH*0.02;
-  var innerW=pW-mX*2, innerH=pH-mY*2;
+  /* Trabajamos en el espacio rotado: el ancho útil es pH, el alto útil es pW */
+  var rW=pH, rH=pW;
+  var mX=rW*0.02, mY=rH*0.02;
+  var innerW=rW-mX*2, innerH=rH-mY*2;
   var refH=innerH*0.14; var eanH=innerH*0.12; var bcH=innerH*0.72; var bcW=innerW*0.96;
   var bcX=mX+(innerW-bcW)/2;
-  var fsRef=Math.max(5,Math.min(12,pH*0.13));
-  var fsEan=Math.max(4,Math.min(9,pH*0.10));
+  var fsRef=Math.max(5,Math.min(12,rH*0.13));
+  var fsEan=Math.max(4,Math.min(9,rH*0.10));
   function buildPage(pageDoc){
-    if(ori==='verti'){
-      pageDoc.saveGraphicsState();
-      var cx=pW/2, cy=pH/2;
-      pageDoc.setCurrentTransformationMatrix(0,1,-1,0,cx+cy,cy-cx);
-    }
+    /* Rotar 90° siempre: trasladar origen al centro, rotar, volver */
+    pageDoc.saveGraphicsState();
+    var cx=pW/2, cy=pH/2;
+    pageDoc.setCurrentTransformationMatrix(0,1,-1,0,cx+cy,cy-cx);
     pageDoc.setFont('helvetica','bold'); pageDoc.setFontSize(fsRef); pageDoc.setTextColor(0,0,0);
-    pageDoc.text(ref,pW/2,mY+refH*0.75,{align:'center'});
+    pageDoc.text(ref,rW/2,mY+refH*0.75,{align:'center'});
     return new Promise(function(resolve){
       bcToPNG(ean,cfg.type,Math.round(bcW*10),Math.round(bcH*10),function(png){
         if(png){ pageDoc.addImage(png,'PNG',bcX,mY+refH,bcW,bcH); }
         pageDoc.setFont('helvetica','normal'); pageDoc.setFontSize(fsEan);
-        pageDoc.text(ean,pW/2,mY+refH+bcH+eanH*0.85,{align:'center'});
-        if(ori==='verti') pageDoc.restoreGraphicsState();
+        pageDoc.text(ean,rW/2,mY+refH+bcH+eanH*0.85,{align:'center'});
+        pageDoc.restoreGraphicsState();
         resolve();
       });
     });
