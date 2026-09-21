@@ -10,55 +10,40 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
 
-/* ===== TABS ===== */
-.tabs {
-  background: white;
-  border-bottom: 2px solid #e24b4a;
-  display: flex;
-  padding: 0 20px;
-  gap: 4px;
-  position: sticky; top: 0; z-index: 20;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-.tab {
-  padding: 12px 22px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 13px;
-  color: #666;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
-  transition: all 0.15s;
-}
+.tabs { background: white; border-bottom: 2px solid #e24b4a; display: flex; padding: 0 20px; gap: 4px; position: sticky; top: 0; z-index: 20; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+.tab { padding: 12px 22px; cursor: pointer; font-weight: bold; font-size: 13px; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
 .tab:hover { color: #e24b4a; }
 .tab.active { color: #e24b4a; border-bottom-color: #e24b4a; }
-
-/* ===== PANEL SECTION ===== */
 .section { display: none; }
 .section.active { display: block; }
 
-/* ===== CONTROLES COMPARTIDOS ===== */
-.controls {
-  background: white; padding: 14px 20px; border-bottom: 1px solid #ddd;
-  display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;
-}
+/* MAESTRO BANNER */
+.maestro-bar { background: #eef6ff; border-bottom: 1px solid #bdd7f8; padding: 5px 20px; font-size: 11.5px; color: #1a5fa8; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.maestro-bar .m-status { font-weight: bold; }
+.maestro-bar .m-count { background: #1a5fa8; color: white; border-radius: 10px; padding: 1px 8px; font-size: 11px; }
+.btn-refresh { background: #1a5fa8; color: white; border: none; border-radius: 4px; padding: 3px 10px; font-size: 11px; cursor: pointer; font-weight: bold; }
+.btn-refresh:hover { background: #155aa0; }
+.btn-refresh:disabled { background: #aaa; cursor: default; }
+
+/* AUTOCOMPLETE */
+.ac-wrap { position: relative; }
+.ac-list { position: absolute; top: 100%; left: 0; z-index: 100; background: white; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto; width: 300px; display: none; }
+.ac-item { padding: 7px 12px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #f0f0f0; }
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.ac-sel { background: #eef6ff; }
+.ac-item .ac-ref { font-weight: bold; color: #222; }
+.ac-item .ac-codes { color: #888; font-size: 11px; }
+
+.controls { background: white; padding: 14px 20px; border-bottom: 1px solid #ddd; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
 .field { display: flex; flex-direction: column; gap: 4px; }
 .field label { font-size: 11px; color: #666; font-weight: bold; }
-.field input, .field select {
-  padding: 7px 9px; border: 1px solid #ccc; border-radius: 4px;
-  font-size: 13px; font-family: Arial, sans-serif;
-}
-.field input { width: 175px; }
-.field select { width: 170px; }
+.field input, .field select { padding: 7px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; font-family: Arial, sans-serif; }
+.field input { width: 175px; } .field select { width: 170px; }
 .btn { padding: 8px 14px; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; font-family: Arial, sans-serif; font-weight: bold; white-space: nowrap; }
-.btn-add   { background: #222; color: white; }
-.btn-add:hover   { background: #444; }
-.btn-print { background: #e24b4a; color: white; }
-.btn-print:hover { background: #c03a39; }
-.btn-clear { background: #eee; color: #333; }
-.btn-clear:hover { background: #ddd; }
-.btn-pdf   { background: #1a6fc4; color: white; }
-.btn-pdf:hover   { background: #155aa0; }
+.btn-add { background: #222; color: white; } .btn-add:hover { background: #444; }
+.btn-print { background: #e24b4a; color: white; } .btn-print:hover { background: #c03a39; }
+.btn-clear { background: #eee; color: #333; } .btn-clear:hover { background: #ddd; }
+.btn-pdf { background: #1a6fc4; color: white; } .btn-pdf:hover { background: #155aa0; }
 .err { color: #e24b4a; font-size: 11px; padding: 3px 0; }
 .info-bar { background: #fffbea; border-bottom: 1px solid #f0e68c; padding: 6px 20px; font-size: 12px; color: #7a6800; }
 .info-bar b { font-weight: bold; }
@@ -66,141 +51,129 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
 .queue-tag { background: #f5f5f5; border: 1px solid #ddd; border-radius: 12px; padding: 3px 10px; font-size: 11px; display: flex; align-items: center; gap: 6px; }
 .queue-tag button { background: none; border: none; cursor: pointer; color: #999; font-size: 13px; line-height:1; padding:0; }
 .queue-tag button:hover { color: #e24b4a; }
-
-/* ===== HOJA A4 ===== */
 .sheet-wrap { display: flex; justify-content: center; padding: 30px; }
 
-#sheet {
-  background: white; width: 210mm; height: 297mm;
-  border: 2px dashed #e24b4a; padding: 8mm 7mm;
-  display: grid; overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
-#sheet.layout-4  { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
-#sheet.layout-6  { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
-#sheet.layout-8  { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
-#sheet.layout-18 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(6, 1fr); }
+#sheet { background: white; width: 210mm; height: 297mm; border: 2px dashed #e24b4a; padding: 6mm 5mm; display: grid; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+#sheet.layout-4  { grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(2,1fr); }
+#sheet.layout-6  { grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(2,1fr); }
+#sheet.layout-8  { grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(4,1fr); }
+#sheet.layout-18 { grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(6,1fr); }
 
-.lc { display: flex; align-items: center; justify-content: center; border: 0.3px solid #ddd; overflow: hidden; }
-.lc.horiz { flex-direction: column; padding: 3mm 2mm; gap: 1.5mm; }
-.lc.horiz .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; }
-.lc.horiz .lean { color: #000; font-family: Arial, sans-serif; text-align: center; }
-.lc.horiz .lbc { width: 100%; display: flex; justify-content: center; }
-.lc.horiz .lbc svg { display: block; }
-.layout-4  .lc.horiz .lref { font-size: 13pt; } .layout-4  .lc.horiz .lean { font-size: 10pt; } .layout-4  .lc.horiz .lbc svg { width: 82mm; height: 30mm; }
-.layout-6  .lc.horiz .lref { font-size: 11pt; } .layout-6  .lc.horiz .lean { font-size: 9pt;  } .layout-6  .lc.horiz .lbc svg { width: 54mm; height: 24mm; }
-.layout-8  .lc.horiz .lref { font-size: 10pt; } .layout-8  .lc.horiz .lean { font-size: 8pt;  } .layout-8  .lc.horiz .lbc svg { width: 82mm; height: 18mm; }
-.layout-18 .lc.horiz .lref { font-size: 8pt;  } .layout-18 .lc.horiz .lean { font-size: 7pt;  } .layout-18 .lc.horiz .lbc svg { width: 52mm; height: 14mm; }
+.lc { display: flex; align-items: center; justify-content: center; border: 0.3px solid #ddd; overflow: hidden; position: relative; }
+.lc.horiz { flex-direction: column; padding: 1mm; gap: 0.5mm; }
+.lc.horiz .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; }
+.lc.horiz .lean { color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; }
+.lc.horiz .lbc { width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; }
+.lc.horiz .lbc svg { display: block; width: 98% !important; height: 100% !important; }
+
+.layout-4  .lc.horiz .lref { font-size: 12pt; } .layout-4  .lc.horiz .lean { font-size: 9pt; }
+.layout-6  .lc.horiz .lref { font-size: 10pt; } .layout-6  .lc.horiz .lean { font-size: 8pt; }
+.layout-8  .lc.horiz .lref { font-size: 9pt;  } .layout-8  .lc.horiz .lean { font-size: 7.5pt; }
+.layout-18 .lc.horiz .lref { font-size: 7.5pt;} .layout-18 .lc.horiz .lean { font-size: 6.5pt; }
 
 .lc.verti { padding: 0; }
-.lc.verti .rot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2mm; transform: rotate(-90deg); transform-origin: center center; }
+.lc.verti .rot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5mm; transform: rotate(-90deg); transform-origin: center center; }
 .lc.verti .rot .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; white-space: nowrap; }
 .lc.verti .rot .lean { color: #000; font-family: Arial, sans-serif; text-align: center; white-space: nowrap; }
-.lc.verti .rot .lbc  { display: flex; justify-content: center; }
+.lc.verti .rot .lbc { display: flex; justify-content: center; }
 .lc.verti .rot .lbc svg { display: block; }
-.layout-4  .lc.verti .rot { width: 137mm; } .layout-4  .lc.verti .rot .lref { font-size: 15pt; } .layout-4  .lc.verti .rot .lean { font-size: 11pt; } .layout-4  .lc.verti .rot .lbc svg { width: 110mm; height: 45mm; }
-.layout-6  .lc.verti .rot { width: 137mm; } .layout-6  .lc.verti .rot .lref { font-size: 12pt; } .layout-6  .lc.verti .rot .lean { font-size: 9.5pt;} .layout-6  .lc.verti .rot .lbc svg { width: 105mm; height: 38mm; }
-.layout-8  .lc.verti .rot { width: 67mm;  } .layout-8  .lc.verti .rot .lref { font-size: 11pt; } .layout-8  .lc.verti .rot .lean { font-size: 8.5pt;} .layout-8  .lc.verti .rot .lbc svg { width: 55mm;  height: 30mm; }
-.layout-18 .lc.verti .rot { width: 45mm;  } .layout-18 .lc.verti .rot .lref { font-size: 8pt;  } .layout-18 .lc.verti .rot .lean { font-size: 6.5pt;} .layout-18 .lc.verti .rot .lbc svg { width: 36mm;  height: 20mm; }
+
+.layout-4  .lc.verti .rot { width: 137mm; } .layout-4  .lc.verti .rot .lref { font-size: 13pt; } .layout-4  .lc.verti .rot .lean { font-size: 10pt; } .layout-4  .lc.verti .rot .lbc svg { width: 130mm; height: 46mm; }
+.layout-6  .lc.verti .rot { width: 137mm; } .layout-6  .lc.verti .rot .lref { font-size: 11pt; } .layout-6  .lc.verti .rot .lean { font-size: 9pt;  } .layout-6  .lc.verti .rot .lbc svg { width: 130mm; height: 38mm; }
+.layout-8  .lc.verti .rot { width: 67mm;  } .layout-8  .lc.verti .rot .lref { font-size: 10pt; } .layout-8  .lc.verti .rot .lean { font-size: 8pt;  } .layout-8  .lc.verti .rot .lbc svg { width: 62mm;  height: 30mm; }
+.layout-18 .lc.verti .rot { width: 45mm;  } .layout-18 .lc.verti .rot .lref { font-size: 7.5pt;} .layout-18 .lc.verti .rot .lean { font-size: 6pt;  } .layout-18 .lc.verti .rot .lbc svg { width: 42mm;  height: 18mm; }
 .ph { background: #fafafa; }
 
-/* ===== SECCIÓN ROLLO ZEBRA ===== */
-.roll-wrap { display: flex; gap: 30px; padding: 30px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
-
-/* Vista previa etiqueta rollo */
-.roll-preview-box {
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-}
-.roll-preview-box h3 { font-size: 13px; color: #555; font-weight: bold; }
+/* ===== ROLLO ===== */
+.roll-wrap { display: flex; gap: 40px; padding: 30px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
+.roll-preview-box { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.roll-preview-box h3 { font-size: 12px; color: #666; font-weight: bold; text-transform: uppercase; letter-spacing: 0.04em; }
+.preview-frame { display: flex; align-items: center; justify-content: center; position: relative; }
 
 #roll-label {
-  background: white;
-  border: 1.5px solid #999;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  position: relative;
-  transition: width 0.2s, height 0.2s;
+  background: white; border: 1.5px solid #aaa;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+  align-items: stretch; justify-content: space-between;
+  padding: 0; overflow: hidden; position: relative;
 }
-#roll-label .rl-ref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; }
-#roll-label .rl-bc  { display: flex; justify-content: center; width: 100%; }
-#roll-label .rl-bc svg { display: block; }
-#roll-label .rl-ean { color: #000; font-family: Arial, sans-serif; text-align: center; }
-
-/* Panel lateral rollo */
-.roll-panel {
-  background: white; border: 1px solid #ddd; border-radius: 8px;
-  padding: 20px; display: flex; flex-direction: column; gap: 14px;
-  min-width: 280px; max-width: 320px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+#roll-label .rl-ref {
+  font-weight: bold; color: #000; font-family: Arial, sans-serif;
+  text-align: center; padding: 2px 4px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
 }
+#roll-label .rl-bc {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; padding: 0 3px;
+}
+#roll-label .rl-bc svg { display: block; width: 100% !important; height: 100% !important; }
+#roll-label .rl-ean {
+  color: #000; font-family: Arial, sans-serif;
+  text-align: center; padding: 2px 4px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.roll-size-chip { font-size: 11px; color: #888; background: #f0f0f0; border-radius: 10px; padding: 3px 10px; }
+.roll-panel { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 280px; max-width: 320px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
 .roll-panel h3 { font-size: 14px; font-weight: bold; color: #222; border-bottom: 1px solid #eee; padding-bottom: 10px; }
 .roll-panel .field input, .roll-panel .field select { width: 100%; }
-.roll-size-info {
-  background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 6px;
-  padding: 10px 14px; font-size: 12px; color: #555; line-height: 1.6;
-}
+.roll-size-info { background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #555; line-height: 1.7; }
 .roll-size-info b { color: #222; }
-.copies-row { display: flex; align-items: center; gap: 10px; }
-.copies-row label { font-size: 11px; color: #666; font-weight: bold; white-space: nowrap; }
-.copies-row input { width: 70px; padding: 7px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
 .roll-btn-row { display: flex; flex-direction: column; gap: 8px; }
+.tip-box { font-size: 11px; color: #888; line-height: 1.5; border-top: 1px solid #eee; padding-top: 10px; }
 
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  .tabs, .controls, .info-bar, .queue-bar, .roll-panel, .roll-preview-box h3 { display: none !important; }
+  html, body { margin: 0; padding: 0; background: white; }
+  .tabs, .controls, .info-bar, .queue-bar, .roll-panel, .roll-preview-box h3, .roll-size-chip, .maestro-bar { display: none !important; }
+  .ac-list { display: none !important; }
 
-  /* A4 mode print */
   body.printing-a4 .section-roll { display: none !important; }
   body.printing-a4 .sheet-wrap { padding: 0 !important; }
-  body.printing-a4 #sheet {
-    width: 210mm !important; height: 297mm !important;
-    border: 1.5px dashed #e24b4a !important; padding: 8mm 7mm !important;
-    margin: 0 !important; box-shadow: none !important;
-  }
+  body.printing-a4 #sheet { width: 210mm !important; height: 297mm !important; border: 1.5px dashed #e24b4a !important; padding: 6mm 5mm !important; margin: 0 !important; box-shadow: none !important; }
   body.printing-a4 .lc { border: 0.3px solid #ccc !important; }
 
-  /* Roll mode print */
   body.printing-roll .section-a4 { display: none !important; }
-  body.printing-roll .roll-wrap { padding: 0 !important; justify-content: flex-start !important; }
-  body.printing-roll .roll-preview-box { align-items: flex-start; gap: 0; }
-  body.printing-roll #roll-label {
-    border: none !important; box-shadow: none !important;
-    margin: 0 !important;
-  }
+  body.printing-roll .roll-wrap { padding: 0 !important; display: block !important; }
+  body.printing-roll .preview-frame { display: block !important; }
+  body.printing-roll #roll-label { border: none !important; box-shadow: none !important; transform: none !important; }
   @page { margin: 0; }
 }
 </style>
 </head>
 <body>
 
-<!-- TABS -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('a4')">📄 Hoja A4</div>
   <div class="tab" onclick="switchTab('roll')">🏷️ Rollo Zebra</div>
 </div>
 
-<!-- ========== SECCIÓN A4 ========== -->
+<!-- MAESTRO BANNER (compartido ambas tabs) -->
+<div class="maestro-bar" id="maestro-bar">
+  <span class="m-status" id="m-status">⏳ Cargando maestro de referencias…</span>
+  <span class="m-count" id="m-count" style="display:none"></span>
+  <button class="btn-refresh" id="btn-refresh" onclick="loadMaestro(true)" disabled>🔄 Actualizar</button>
+  <span id="m-ts" style="color:#6699cc;font-size:11px;"></span>
+</div>
+
+<!-- A4 -->
 <div class="section section-a4 active">
   <div class="controls">
-    <div class="field"><label>REFERENCIA</label><input type="text" id="iref" placeholder="Ej: 08201-03" /></div>
-    <div class="field">
-      <label>TIPO DE CÓDIGO</label>
+    <div class="field ac-wrap">
+      <label>REFERENCIA</label>
+      <input type="text" id="iref" placeholder="Escribe para buscar…" autocomplete="off"
+             oninput="acInput('iref','iean','itype','eerr','ac-a4')"
+             onkeydown="acKey(event,'ac-a4','iref','iean','itype')"
+             onblur="setTimeout(function(){acHide('ac-a4')},180)"/>
+      <div class="ac-list" id="ac-a4"></div>
+    </div>
+    <div class="field"><label>TIPO DE CÓDIGO</label>
       <select id="itype" onchange="updateType()">
         <option value="EAN13">EAN-13 (13 dígitos)</option>
         <option value="ITF14">DUN-14 / ITF-14 (14 dígitos)</option>
       </select>
     </div>
-    <div class="field">
-      <label id="elbl">CÓDIGO EAN-13</label>
-      <input type="text" id="iean" placeholder="8447562411400" maxlength="14" />
-      <div class="err" id="eerr"></div>
-    </div>
-    <div class="field">
-      <label>CANTIDAD / LAYOUT</label>
+    <div class="field"><label id="elbl">CÓDIGO EAN-13</label><input type="text" id="iean" placeholder="8447562411400" maxlength="14"/><div class="err" id="eerr"></div></div>
+    <div class="field"><label>CANTIDAD / LAYOUT</label>
       <select id="iqty">
         <option value="4">4 etiquetas (2×2)</option>
         <option value="6">6 etiquetas (3×2)</option>
@@ -208,8 +181,7 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
         <option value="18" selected>18 etiquetas (3×6)</option>
       </select>
     </div>
-    <div class="field">
-      <label>ORIENTACIÓN</label>
+    <div class="field"><label>ORIENTACIÓN</label>
       <select id="iori">
         <option value="horiz">↔ Horizontal</option>
         <option value="verti">↕ Vertical (todo rotado)</option>
@@ -224,94 +196,254 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
   <div class="sheet-wrap"><div id="sheet" class="layout-18"></div></div>
 </div>
 
-<!-- ========== SECCIÓN ROLLO ZEBRA ========== -->
+<!-- ROLLO -->
 <div class="section section-roll">
   <div class="roll-wrap">
-
-    <!-- Vista previa -->
     <div class="roll-preview-box">
       <h3>Vista previa etiqueta rollo</h3>
-      <div id="roll-label">
-        <div class="rl-ref" id="rl-ref">—</div>
-        <div class="rl-bc"><svg id="rl-bc"></svg></div>
-        <div class="rl-ean" id="rl-ean">—</div>
+      <div class="preview-frame" id="preview-frame">
+        <div id="roll-label">
+          <div class="rl-ref" id="rl-ref">REFERENCIA</div>
+          <div class="rl-bc"><svg id="rl-bc"></svg></div>
+          <div class="rl-ean" id="rl-ean">0000000000000</div>
+        </div>
       </div>
-      <div style="font-size:11px;color:#999;margin-top:4px;" id="roll-size-label">—</div>
+      <div class="roll-size-chip" id="roll-size-chip">70 × 55 mm</div>
     </div>
 
-    <!-- Panel de configuración -->
     <div class="roll-panel">
       <h3>🏷️ Configuración Rollo Zebra</h3>
-
-      <div class="field">
+      <div class="field ac-wrap">
         <label>REFERENCIA</label>
-        <input type="text" id="r-ref" placeholder="Ej: 08201-03" oninput="renderRoll()" />
+        <input type="text" id="r-ref" placeholder="Escribe para buscar…" autocomplete="off"
+               oninput="acInputRoll()"
+               onkeydown="acKeyRoll(event)"
+               onblur="setTimeout(function(){acHide('ac-roll')},180)"/>
+        <div class="ac-list" id="ac-roll"></div>
       </div>
-
-      <div class="field">
-        <label>TAMAÑO DE ETIQUETA</label>
+      <div class="field"><label>TAMAÑO DE ETIQUETA</label>
         <select id="r-size" onchange="onSizeChange()">
-          <option value="xs">XS — EAN-13 &nbsp;55 × 45 mm</option>
-          <option value="std-ean" selected>Estándar EAN-13 &nbsp;70 × 55 mm</option>
-          <option value="std-dun">Estándar DUN-14 &nbsp;90 × 50 mm</option>
+          <option value="xs">XS — EAN-13 · 55 × 45 mm</option>
+          <option value="std-ean" selected>Estándar EAN-13 · 70 × 55 mm</option>
+          <option value="std-dun">Estándar DUN-14 · 90 × 50 mm</option>
           <option value="custom">Personalizado…</option>
         </select>
       </div>
-
-      <div id="custom-fields" style="display:none;gap:8px;flex-direction:column;">
+      <div id="custom-fields" style="display:none;flex-direction:column;gap:8px;">
         <div style="display:flex;gap:8px;">
-          <div class="field" style="flex:1;"><label>ANCHO (mm)</label><input type="number" id="r-cw" value="70" min="20" max="200" oninput="renderRoll()" /></div>
-          <div class="field" style="flex:1;"><label>ALTO (mm)</label><input type="number" id="r-ch" value="55" min="10" max="200" oninput="renderRoll()" /></div>
+          <div class="field" style="flex:1;"><label>ANCHO (mm)</label><input type="number" id="r-cw" value="70" min="20" max="250" oninput="renderRoll()"/></div>
+          <div class="field" style="flex:1;"><label>ALTO (mm)</label><input type="number" id="r-ch" value="55" min="10" max="250" oninput="renderRoll()"/></div>
         </div>
       </div>
-
-      <div class="roll-size-info" id="r-info">
-        <b>EAN-13 Estándar</b><br>Ancho: 70 mm · Alto: 55 mm<br>Código: EAN-13 (13 dígitos)
-      </div>
-
-      <div class="field">
-        <label id="r-elbl">CÓDIGO EAN-13</label>
-        <input type="text" id="r-ean" placeholder="8447562411400" maxlength="14" oninput="renderRoll()" />
-        <div class="err" id="r-err"></div>
-      </div>
-
-      <div class="field">
-        <label>ORIENTACIÓN BARCODE</label>
+      <div class="roll-size-info" id="r-info"><b>Estándar EAN-13</b><br>70 × 55 mm · EAN-13 (13 dígitos)</div>
+      <div class="field"><label id="r-elbl">CÓDIGO EAN-13</label><input type="text" id="r-ean" placeholder="8447562411400" maxlength="14" oninput="renderRoll()"/><div class="err" id="r-err"></div></div>
+      <div class="field"><label>ORIENTACIÓN BARCODE</label>
         <select id="r-ori" onchange="renderRoll()">
           <option value="horiz">↔ Horizontal</option>
           <option value="verti">↕ Vertical (todo rotado)</option>
         </select>
       </div>
-
+      <div class="field"><label>COPIAS A IMPRIMIR</label>
+        <input type="number" id="r-copies" value="1" min="1" max="999" style="width:100px;"/>
+      </div>
       <div class="roll-btn-row">
         <button class="btn btn-pdf" onclick="downloadRollPDF()">⬇ Descargar PDF (medida exacta)</button>
         <button class="btn btn-print" onclick="printRoll()">🖨 Imprimir en Zebra</button>
       </div>
-
-      <div style="font-size:11px;color:#888;line-height:1.5;border-top:1px solid #eee;padding-top:10px;">
-        💡 <b>Consejo Zebra por USB:</b> Al imprimir, selecciona tu impresora Zebra, establece el tamaño de página igual al de la etiqueta y elige <b>escala 100%</b> (sin ajustar a página).
-      </div>
+      <div class="tip-box">💡 <b>Zebra por USB:</b> Al imprimir selecciona la Zebra, tamaño de página = medida de la etiqueta y escala <b>100%</b>. Las copias también puedes elegirlas en el diálogo de impresión.</div>
     </div>
   </div>
 </div>
 
 <script>
-/* ============================================================
-   TABS
-   ============================================================ */
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('active', (tab==='a4'&&i===0)||(tab==='roll'&&i===1)); });
-  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-  document.querySelector('.section-'+tab).classList.add('active');
+/* =========================================================
+   MAESTRO DE REFERENCIAS (Google Sheets CSV)
+   ========================================================= */
+var SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQvcTx23rNZEx9CPCB1mLXhTu6TptOp8LD6t-YztnW2QcVTRtT_wc41Q0_QlgoSDipqmfZ5vlvGH7jU/pub?gid=0&single=true&output=csv';
+var maestro = []; /* [{ref, ean13, dun14}] */
+
+function parseCSV(text){
+  var lines = text.trim().split(/\r?\n/);
+  var result = [];
+  /* Detectar cabecera */
+  var start = 0;
+  if(lines[0] && /referencia/i.test(lines[0])) start = 1;
+  for(var i = start; i < lines.length; i++){
+    var parts = lines[i].split(',');
+    if(parts.length < 2) continue;
+    var ref = (parts[0]||'').replace(/^"|"$/g,'').trim();
+    var ean = (parts[1]||'').replace(/^"|"$/g,'').trim();
+    var dun = (parts[2]||'').replace(/^"|"$/g,'').trim();
+    if(ref) result.push({ref:ref, ean13:ean, dun14:dun});
+  }
+  return result;
 }
 
-/* ============================================================
-   A4 SECTION
-   ============================================================ */
-var queue=[]; var currentLayout=18; var totalSlots=18;
-var BC_PARAMS={
-  horiz:{4:{w:3.0,h:90},6:{w:2.4,h:72},8:{w:3.0,h:55},18:{w:1.7,h:42}},
-  verti:{4:{w:3.0,h:130},6:{w:2.4,h:110},8:{w:2.4,h:85},18:{w:1.4,h:55}}
+function loadMaestro(manual){
+  var btn = document.getElementById('btn-refresh');
+  var status = document.getElementById('m-status');
+  var count = document.getElementById('m-count');
+  btn.disabled = true;
+  status.textContent = '⏳ Actualizando maestro…';
+  count.style.display = 'none';
+
+  /* Añadir timestamp para evitar caché del navegador */
+  var url = SHEET_CSV_URL + '&_t=' + Date.now();
+  fetch(url)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+    .then(function(txt){
+      maestro = parseCSV(txt);
+      status.textContent = '✅ Maestro cargado';
+      if(maestro.length > 0){
+        count.textContent = maestro.length + ' referencias';
+        count.style.display = 'inline';
+      }
+      var now = new Date();
+      document.getElementById('m-ts').textContent = 'Actualizado: ' + now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      btn.disabled = false;
+    })
+    .catch(function(e){
+      status.textContent = '⚠️ Error al cargar maestro — puedes introducir los datos manualmente';
+      btn.disabled = false;
+      if(manual) alert('No se pudo cargar el maestro: ' + e.message + '\nPuedes igualmente introducir los datos manualmente.');
+    });
+}
+
+/* =========================================================
+   AUTOCOMPLETADO
+   ========================================================= */
+var acIdx = -1;
+
+function acSearch(query){
+  if(!query || query.length < 1) return [];
+  var q = query.toLowerCase();
+  return maestro.filter(function(m){
+    return m.ref.toLowerCase().indexOf(q) >= 0;
+  }).slice(0, 12);
+}
+
+function acRender(listId, items, onSelect){
+  var el = document.getElementById(listId);
+  if(!items.length){ el.style.display='none'; return; }
+  acIdx = -1;
+  el.innerHTML = items.map(function(m, i){
+    var codes = m.ean13 ? 'EAN: '+m.ean13 : '';
+    if(m.dun14) codes += (codes?' · ':'') + 'DUN: '+m.dun14;
+    return '<div class="ac-item" data-i="'+i+'" onmousedown="'+onSelect+'('+i+')">'
+      +'<div class="ac-ref">'+m.ref+'</div>'
+      +'<div class="ac-codes">'+codes+'</div>'
+      +'</div>';
+  }).join('');
+  el.style.display = 'block';
+  el._items = items;
+}
+
+function acHide(listId){ var el=document.getElementById(listId); if(el){ el.style.display='none'; acIdx=-1; } }
+
+function acHighlight(listId){
+  var el=document.getElementById(listId);
+  var items=el.querySelectorAll('.ac-item');
+  items.forEach(function(it,i){ it.classList.toggle('ac-sel', i===acIdx); });
+  if(acIdx>=0 && items[acIdx]) items[acIdx].scrollIntoView({block:'nearest'});
+}
+
+/* --- A4 autocomplete --- */
+var acA4Items = [];
+function acInput(refId, eanId, typeId, errId, listId){
+  var q = document.getElementById(refId).value;
+  acA4Items = acSearch(q);
+  acRender(listId, acA4Items, 'acSelectA4');
+}
+function acSelectA4(i){
+  var m = acA4Items[i];
+  if(!m) return;
+  document.getElementById('iref').value = m.ref;
+  /* Determinar qué código rellenar */
+  if(m.dun14 && m.dun14.length===14){
+    document.getElementById('itype').value = 'ITF14';
+    document.getElementById('iean').value = m.dun14;
+    updateType();
+  } else if(m.ean13){
+    document.getElementById('itype').value = 'EAN13';
+    document.getElementById('iean').value = m.ean13;
+    updateType();
+  }
+  document.getElementById('eerr').textContent='';
+  acHide('ac-a4');
+}
+function acKey(event, listId, refId, eanId, typeId){
+  var el = document.getElementById(listId);
+  if(el.style.display==='none') return;
+  var n = el.querySelectorAll('.ac-item').length;
+  if(event.key==='ArrowDown'){ acIdx=Math.min(acIdx+1,n-1); acHighlight(listId); event.preventDefault(); }
+  else if(event.key==='ArrowUp'){ acIdx=Math.max(acIdx-1,-1); acHighlight(listId); event.preventDefault(); }
+  else if(event.key==='Enter'&&acIdx>=0){ acSelectA4(acIdx); event.preventDefault(); }
+  else if(event.key==='Escape'){ acHide(listId); }
+}
+
+/* --- ROLLO autocomplete --- */
+var acRollItems = [];
+function acInputRoll(){
+  var q = document.getElementById('r-ref').value;
+  acRollItems = acSearch(q);
+  acRender('ac-roll', acRollItems, 'acSelectRoll');
+  renderRoll();
+}
+function acSelectRoll(i){
+  var m = acRollItems[i];
+  if(!m) return;
+  document.getElementById('r-ref').value = m.ref;
+  var cfg = getRollCfg();
+  /* Si tamaño actual es DUN-14 y hay dun14, usarlo */
+  if(cfg.type==='ITF14' && m.dun14 && m.dun14.length===14){
+    document.getElementById('r-ean').value = m.dun14;
+  } else if(m.ean13){
+    document.getElementById('r-ean').value = m.ean13;
+  }
+  document.getElementById('r-err').textContent='';
+  acHide('ac-roll');
+  renderRoll();
+}
+function acKeyRoll(event){
+  var el = document.getElementById('ac-roll');
+  if(el.style.display==='none') return;
+  var n = el.querySelectorAll('.ac-item').length;
+  if(event.key==='ArrowDown'){ acIdx=Math.min(acIdx+1,n-1); acHighlight('ac-roll'); event.preventDefault(); }
+  else if(event.key==='ArrowUp'){ acIdx=Math.max(acIdx-1,-1); acHighlight('ac-roll'); event.preventDefault(); }
+  else if(event.key==='Enter'&&acIdx>=0){ acSelectRoll(acIdx); event.preventDefault(); }
+  else if(event.key==='Escape'){ acHide('ac-roll'); }
+}
+
+/* =========================================================
+   TABS
+   ========================================================= */
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(function(el,i){ el.classList.toggle('active',(t==='a4'&&i===0)||(t==='roll'&&i===1)); });
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelector('.section-'+t).classList.add('active');
+}
+
+/* =========================================================
+   VALIDACIÓN COMÚN
+   ========================================================= */
+function validate(c,t){
+  if(t==='EAN13'){
+    if(!/^\d{13}$/.test(c)) return 'EAN-13: exactamente 13 dígitos numéricos.';
+    var d=c.split('').map(Number),s=d.slice(0,12).reduce(function(a,v,i){return a+v*(i%2===0?1:3);},0),k=(10-s%10)%10;
+    if(k!==d[12]) return 'Dígito de control incorrecto (debe ser '+k+').';
+  } else {
+    if(!/^\d{14}$/.test(c)) return 'DUN-14: exactamente 14 dígitos numéricos.';
+  }
+  return null;
+}
+
+/* =========================================================
+   A4
+   ========================================================= */
+var queue=[],currentLayout=18,totalSlots=18;
+var BC={
+  horiz:{4:{w:2.6,h:130},6:{w:2.0,h:110},8:{w:2.6,h:75},18:{w:1.5,h:44}},
+  verti:{4:{w:2.6,h:380},6:{w:2.0,h:380},8:{w:2.0,h:185},18:{w:1.3,h:120}}
 };
 
 function updateType(){
@@ -321,309 +453,206 @@ function updateType(){
   document.getElementById('iean').maxLength=t==='EAN13'?13:14;
   document.getElementById('eerr').textContent='';
 }
-
-function validate(code,type){
-  if(type==='EAN13'){
-    if(!/^\d{13}$/.test(code)) return 'EAN-13 debe tener exactamente 13 dígitos numéricos.';
-    var d=code.split('').map(Number);
-    var s=d.slice(0,12).reduce(function(a,v,i){return a+v*(i%2===0?1:3);},0);
-    var c=(10-s%10)%10;
-    if(c!==d[12]) return 'Dígito de control incorrecto (debe ser '+c+').';
-  } else {
-    if(!/^\d{14}$/.test(code)) return 'DUN-14 debe tener exactamente 14 dígitos numéricos.';
-  }
-  return null;
-}
-
 function addLabel(){
-  var ref=document.getElementById('iref').value.trim();
-  var ean=document.getElementById('iean').value.trim();
-  var type=document.getElementById('itype').value;
-  var qty=parseInt(document.getElementById('iqty').value);
-  var ori=document.getElementById('iori').value;
-  var errEl=document.getElementById('eerr');
+  var ref=document.getElementById('iref').value.trim(),ean=document.getElementById('iean').value.trim(),
+      type=document.getElementById('itype').value,qty=parseInt(document.getElementById('iqty').value),
+      ori=document.getElementById('iori').value,errEl=document.getElementById('eerr');
   if(!ref){alert('Introduce la referencia.');return;}
-  if(!ean){alert('Introduce el código EAN/DUN.');return;}
-  var err=validate(ean,type);
-  if(err){errEl.textContent=err;return;}
-  errEl.textContent='';
-  if(queue.length===0){currentLayout=qty;totalSlots=qty;}
-  else if(qty!==currentLayout){alert('Layout fijo en '+currentLayout+' etiquetas. Limpia primero.');return;}
+  if(!ean){alert('Introduce el código.');return;}
+  var e=validate(ean,type);if(e){errEl.textContent=e;return;}errEl.textContent='';
+  if(!queue.length){currentLayout=qty;totalSlots=qty;}
+  else if(qty!==currentLayout){alert('Layout fijo en '+currentLayout+'. Limpia primero.');return;}
   var used=queue.reduce(function(a,i){return a+i.qty;},0);
   if(used>=totalSlots){alert('Hoja llena.');return;}
   queue.push({ref:ref,ean:ean,type:type,qty:Math.min(qty,totalSlots-used),ori:ori});
   document.getElementById('iref').value='';document.getElementById('iean').value='';
   renderQueue();renderSheet();
 }
-function removeItem(i){
-  queue.splice(i,1);
-  if(!queue.length){currentLayout=parseInt(document.getElementById('iqty').value);totalSlots=currentLayout;}
-  renderQueue();renderSheet();
-}
+function removeItem(i){queue.splice(i,1);if(!queue.length){currentLayout=parseInt(document.getElementById('iqty').value);totalSlots=currentLayout;}renderQueue();renderSheet();}
 function renderQueue(){
   var bar=document.getElementById('qbar'),ibar=document.getElementById('ibar');
   if(!queue.length){bar.innerHTML='<span style="color:#aaa">Sin etiquetas aún</span>';ibar.textContent='Selecciona cantidad, orientación y añade etiquetas.';return;}
-  var used=queue.reduce(function(a,i){return a+i.qty;},0);
-  var cols={4:2,6:3,8:2,18:3}[currentLayout];
+  var used=queue.reduce(function(a,i){return a+i.qty;},0),cols={4:2,6:3,8:2,18:3}[currentLayout];
   ibar.innerHTML='Layout: <b>'+cols+' col × '+(currentLayout/cols)+' fil = '+currentLayout+' etiquetas</b> &nbsp;·&nbsp; '+used+'/'+currentLayout+' ocupadas';
-  var html='';
-  queue.forEach(function(it,idx){
-    html+='<span class="queue-tag">'+it.ref+' &nbsp;'+(it.ori==='verti'?'↕':'↔')+'&nbsp; ×'+it.qty+' <button onclick="removeItem('+idx+')">✕</button></span>';
-  });
-  bar.innerHTML=html;
+  bar.innerHTML=queue.map(function(it,idx){return '<span class="queue-tag">'+it.ref+' &nbsp;'+(it.ori==='verti'?'↕':'↔')+'&nbsp; ×'+it.qty+' <button onclick="removeItem('+idx+')">✕</button></span>';}).join('');
 }
 function renderSheet(){
-  var sheet=document.getElementById('sheet');
-  sheet.innerHTML='';sheet.className='layout-'+currentLayout;
+  var sheet=document.getElementById('sheet');sheet.innerHTML='';sheet.className='layout-'+currentLayout;
   var labels=[];queue.forEach(function(it){for(var i=0;i<it.qty;i++)labels.push(it);});
   for(var i=0;i<currentLayout;i++){
-    var cell=document.createElement('div');
+    var cell=document.createElement('div'),sid='bc'+i;
     if(i<labels.length){
-      var lb=labels[i],ori=lb.ori,sid='bc'+i,p=BC_PARAMS[ori][currentLayout];
+      var lb=labels[i],ori=lb.ori,p=BC[ori][currentLayout];
       cell.className='lc '+ori;
-      if(ori==='verti'){
-        cell.innerHTML='<div class="rot"><div class="lref">'+lb.ref+'</div><div class="lbc"><svg id="'+sid+'"></svg></div><div class="lean">'+lb.ean+'</div></div>';
-      } else {
-        cell.innerHTML='<div class="lref">'+lb.ref+'</div><div class="lbc"><svg id="'+sid+'"></svg></div><div class="lean">'+lb.ean+'</div>';
-      }
+      cell.innerHTML=ori==='verti'
+        ?'<div class="rot"><div class="lref">'+lb.ref+'</div><div class="lbc"><svg id="'+sid+'"></svg></div><div class="lean">'+lb.ean+'</div></div>'
+        :'<div class="lref">'+lb.ref+'</div><div class="lbc"><svg id="'+sid+'"></svg></div><div class="lean">'+lb.ean+'</div>';
       sheet.appendChild(cell);
-      (function(id,ean,type,params){
-        try{JsBarcode('#'+id,ean,{format:type,displayValue:false,margin:0,width:params.w,height:params.h,background:'#ffffff',lineColor:'#000000'});}
-        catch(e){var el=document.getElementById(id);if(el)el.outerHTML='<span style="color:red;font-size:9px">Error</span>';}
+      (function(id,ean,type,p){
+        try{JsBarcode('#'+id,ean,{format:type,displayValue:false,margin:0,width:p.w,height:p.h,background:'#fff',lineColor:'#000'});}
+        catch(e){}
       })(sid,lb.ean,lb.type,p);
-    } else {
-      cell.className='lc ph';sheet.appendChild(cell);
-    }
+    }else{cell.className='lc ph';sheet.appendChild(cell);}
   }
 }
 function printA4(){
   var labels=[];queue.forEach(function(it){for(var i=0;i<it.qty;i++)labels.push(it);});
   if(!labels.length){alert('Añade etiquetas primero.');return;}
-  document.body.className='printing-a4';
-  window.print();
-  setTimeout(function(){document.body.className='';},500);
+  document.body.className='printing-a4';window.print();setTimeout(function(){document.body.className='';},500);
 }
 function clearAll(){
   if(queue.length&&!confirm('¿Limpiar toda la hoja?'))return;
-  queue=[];currentLayout=parseInt(document.getElementById('iqty').value);totalSlots=currentLayout;
-  renderQueue();renderSheet();
+  queue=[];currentLayout=parseInt(document.getElementById('iqty').value);totalSlots=currentLayout;renderQueue();renderSheet();
 }
 
-/* ============================================================
-   ROLL SECTION
-   ============================================================ */
-var SIZES = {
-  'xs':      { w:55, h:45, type:'EAN13', label:'XS — EAN-13', desc:'Ancho: 55 mm · Alto: 45 mm' },
-  'std-ean': { w:70, h:55, type:'EAN13', label:'Estándar EAN-13', desc:'Ancho: 70 mm · Alto: 55 mm' },
-  'std-dun': { w:90, h:50, type:'ITF14', label:'Estándar DUN-14', desc:'Ancho: 90 mm · Alto: 50 mm' },
-  'custom':  { w:70, h:55, type:'EAN13', label:'Personalizado', desc:'Define las medidas' }
+/* =========================================================
+   ROLLO ZEBRA
+   ========================================================= */
+var SIZES={
+  'xs':     {w:55,h:45,type:'EAN13',label:'XS — EAN-13',    info:'<b>XS — EAN-13</b><br>55 × 45 mm · EAN-13 (13 dígitos)'},
+  'std-ean':{w:70,h:55,type:'EAN13',label:'Estándar EAN-13',info:'<b>Estándar EAN-13</b><br>70 × 55 mm · EAN-13 (13 dígitos)'},
+  'std-dun':{w:90,h:50,type:'ITF14',label:'Estándar DUN-14',info:'<b>Estándar DUN-14</b><br>90 × 50 mm · DUN-14/ITF-14 (14 dígitos)'},
+  'custom': {w:70,h:55,type:'EAN13',label:'Personalizado',   info:'<b>Personalizado</b><br>Define el ancho y alto en mm'}
 };
+var PX=3.78;
 
-// Escala px/mm para pantalla
-var PX_PER_MM = 3.5;
-
-function getRollConfig(){
-  var key = document.getElementById('r-size').value;
-  var cfg = Object.assign({}, SIZES[key]);
-  if(key==='custom'){
-    cfg.w = parseFloat(document.getElementById('r-cw').value)||70;
-    cfg.h = parseFloat(document.getElementById('r-ch').value)||55;
-    cfg.type = cfg.w>60 ? 'EAN13' : 'EAN13';
+function getRollCfg(){
+  var k=document.getElementById('r-size').value,c=Object.assign({},SIZES[k]);
+  if(k==='custom'){
+    c.w=parseFloat(document.getElementById('r-cw').value)||70;
+    c.h=parseFloat(document.getElementById('r-ch').value)||55;
   }
-  return cfg;
+  return c;
 }
 
 function onSizeChange(){
-  var key=document.getElementById('r-size').value;
-  var cfg=SIZES[key];
-  var customFields=document.getElementById('custom-fields');
-  customFields.style.display = key==='custom'?'flex':'none';
-
-  var info=document.getElementById('r-info');
-  var rElbl=document.getElementById('r-elbl');
-  var rEan=document.getElementById('r-ean');
-
-  if(key!=='custom'){
-    info.innerHTML='<b>'+cfg.label+'</b><br>'+cfg.desc+'<br>Código: '+(cfg.type==='EAN13'?'EAN-13 (13 dígitos)':'DUN-14 (14 dígitos)');
-    rElbl.textContent = cfg.type==='EAN13'?'CÓDIGO EAN-13':'CÓDIGO DUN-14/ITF-14';
-    rEan.placeholder  = cfg.type==='EAN13'?'8447562411400':'08447562411400';
-    rEan.maxLength    = cfg.type==='EAN13'?13:14;
-  } else {
-    info.innerHTML='<b>Personalizado</b><br>Define el ancho y alto en mm';
-    rElbl.textContent='CÓDIGO EAN/DUN';
-    rEan.placeholder='Introduce el código';
-    rEan.maxLength=14;
+  var k=document.getElementById('r-size').value,c=SIZES[k];
+  document.getElementById('custom-fields').style.display=k==='custom'?'flex':'none';
+  document.getElementById('r-info').innerHTML=c.info;
+  if(k!=='custom'){
+    document.getElementById('r-elbl').textContent=c.type==='EAN13'?'CÓDIGO EAN-13':'CÓDIGO DUN-14/ITF-14';
+    document.getElementById('r-ean').placeholder=c.type==='EAN13'?'8447562411400':'08447562411400';
+    document.getElementById('r-ean').maxLength=c.type==='EAN13'?13:14;
   }
   document.getElementById('r-err').textContent='';
   renderRoll();
 }
 
-function validateRoll(code, type){
-  if(!code) return null;
-  if(type==='EAN13'){
-    if(!/^\d{13}$/.test(code)) return 'EAN-13: 13 dígitos numéricos.';
-    var d=code.split('').map(Number);
-    var s=d.slice(0,12).reduce(function(a,v,i){return a+v*(i%2===0?1:3);},0);
-    var c=(10-s%10)%10;
-    if(c!==d[12]) return 'Dígito de control incorrecto (debe ser '+c+').';
+function renderRoll(){
+  var cfg=getRollCfg();
+  var ref=document.getElementById('r-ref').value.trim()||'REFERENCIA';
+  var ean=document.getElementById('r-ean').value.trim()||'0000000000000';
+  var ori=document.getElementById('r-ori').value;
+  var errEl=document.getElementById('r-err');
+  var wPx=cfg.w*PX, hPx=cfg.h*PX;
+  var lbl=document.getElementById('roll-label');
+  var frame=document.getElementById('preview-frame');
+  if(ori==='verti'){
+    lbl.style.width=wPx+'px'; lbl.style.height=hPx+'px';
+    lbl.style.transform='rotate(-90deg)';
+    frame.style.width=hPx+'px'; frame.style.height=wPx+'px';
   } else {
-    if(!/^\d{14}$/.test(code)) return 'DUN-14: 14 dígitos numéricos.';
+    lbl.style.width=wPx+'px'; lbl.style.height=hPx+'px';
+    lbl.style.transform='none';
+    frame.style.width=wPx+'px'; frame.style.height=hPx+'px';
   }
-  return null;
+  document.getElementById('roll-size-chip').textContent=cfg.w+' × '+cfg.h+' mm';
+  var short=Math.min(wPx,hPx);
+  var fsRef=Math.max(8,Math.min(16,short*0.10));
+  var fsEan=Math.max(7,Math.min(13,short*0.08));
+  var rlRef=document.getElementById('rl-ref');
+  var rlEan=document.getElementById('rl-ean');
+  var rlSvg=document.getElementById('rl-bc');
+  rlRef.textContent=ref; rlRef.style.fontSize=fsRef+'px'; rlRef.style.height=Math.round(hPx*0.14)+'px';
+  rlEan.textContent=ean; rlEan.style.fontSize=fsEan+'px'; rlEan.style.height=Math.round(hPx*0.12)+'px';
+  if(ean&&ean!=='0000000000000'){
+    var realEan=document.getElementById('r-ean').value.trim();
+    var err=realEan?validate(realEan,cfg.type):null;
+    if(realEan) errEl.textContent=err||'';
+    var codeToRender=(!err&&realEan)?realEan:'8447562411400';
+    var typeToRender=(!err&&realEan)?cfg.type:'EAN13';
+    var bcH=Math.round(hPx*0.72);
+    var bcW=Math.round(wPx*0.95);
+    var barW=Math.max(1.0,bcW/160);
+    try{
+      JsBarcode('#rl-bc',codeToRender,{format:typeToRender,displayValue:false,margin:0,width:barW,height:bcH,background:'#fff',lineColor:'#000'});
+      rlSvg.setAttribute('width',bcW+'px'); rlSvg.setAttribute('height',bcH+'px');
+      rlSvg.style.display='block';
+    }catch(e){rlSvg.style.display='none';}
+  }
 }
 
-function renderRoll(){
-  var cfg = getRollConfig();
-  var ref = document.getElementById('r-ref').value.trim() || '—';
-  var ean = document.getElementById('r-ean').value.trim();
-  var ori = document.getElementById('r-ori').value;
-  var errEl= document.getElementById('r-err');
-
-  // Tamaño visual en pantalla
-  var lbl = document.getElementById('roll-label');
-  var wPx = cfg.w * PX_PER_MM;
-  var hPx = cfg.h * PX_PER_MM;
-  lbl.style.width  = wPx + 'px';
-  lbl.style.height = hPx + 'px';
-  lbl.style.padding= '4px 6px';
-
-  document.getElementById('roll-size-label').textContent = cfg.w + ' × ' + cfg.h + ' mm';
-
-  // Tamaños de fuente adaptativos
-  var fsRef = Math.max(7, Math.min(14, cfg.h * 0.18));
-  var fsEan = Math.max(6, Math.min(11, cfg.h * 0.13));
-  var bcH   = Math.max(20, cfg.h * PX_PER_MM * 0.45);
-  var bcW   = cfg.w * PX_PER_MM * 0.82;
-  var barW  = Math.max(1.0, cfg.w / 40);
-
-  var rlRef = document.getElementById('rl-ref');
-  var rlEan = document.getElementById('rl-ean');
-  var rlBcSvg = document.getElementById('rl-bc');
-
-  rlRef.textContent = ref;
-  rlRef.style.fontSize = fsRef + 'px';
-  rlEan.textContent = ean || '—';
-  rlEan.style.fontSize = fsEan + 'px';
-
-  // Aplicar orientación al label completo
-  if(ori === 'verti'){
-    lbl.style.flexDirection = 'column';
-    lbl.style.transform = 'rotate(-90deg)';
-    lbl.style.transformOrigin = 'center center';
-    lbl.style.margin = Math.abs(wPx-hPx)/2 + 'px auto';
-  } else {
-    lbl.style.flexDirection = 'column';
-    lbl.style.transform = '';
-    lbl.style.margin = '0 auto';
-  }
-
-  // Validar y generar barcode
-  if(ean){
-    var err = validateRoll(ean, cfg.type);
-    errEl.textContent = err || '';
-    if(!err){
-      try{
-        JsBarcode('#rl-bc', ean, {
-          format: cfg.type, displayValue: false,
-          margin:0, width: barW, height: bcH,
-          background:'#fff', lineColor:'#000'
-        });
-        rlBcSvg.style.width  = bcW+'px';
-        rlBcSvg.style.height = bcH+'px';
-        rlBcSvg.style.display='block';
-      } catch(e){ rlBcSvg.style.display='none'; }
-    } else {
-      rlBcSvg.style.display='none';
-    }
-  } else {
-    rlBcSvg.style.display='none';
-    errEl.textContent='';
-  }
+function bcToPNG(ean, type, pxW, pxH, cb){
+  var svgEl=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  try{JsBarcode(svgEl,ean,{format:type,displayValue:false,margin:0,width:Math.max(1,pxW/120),height:pxH,background:'#fff',lineColor:'#000'});}
+  catch(e){cb(null);return;}
+  var svgStr=new XMLSerializer().serializeToString(svgEl);
+  var blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var canvas=document.createElement('canvas');
+  canvas.width=pxW;canvas.height=pxH;
+  var ctx=canvas.getContext('2d');
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,pxW,pxH);
+  var img=new Image();
+  img.onload=function(){ctx.drawImage(img,0,0,pxW,pxH);URL.revokeObjectURL(url);cb(canvas.toDataURL('image/png'));};
+  img.onerror=function(){URL.revokeObjectURL(url);cb(null);};
+  img.src=url;
 }
 
 function downloadRollPDF(){
-  var cfg = getRollConfig();
-  var ref = document.getElementById('r-ref').value.trim();
-  var ean = document.getElementById('r-ean').value.trim();
-  var ori = document.getElementById('r-ori').value;
-  var errEl= document.getElementById('r-err');
-
+  var cfg=getRollCfg();
+  var ref=document.getElementById('r-ref').value.trim();
+  var ean=document.getElementById('r-ean').value.trim();
+  var ori=document.getElementById('r-ori').value;
+  var copies=parseInt(document.getElementById('r-copies').value)||1;
+  var errEl=document.getElementById('r-err');
   if(!ref){alert('Introduce la referencia.');return;}
   if(!ean){alert('Introduce el código.');return;}
-  var err=validateRoll(ean,cfg.type);
-  if(err){errEl.textContent=err;return;}
-  errEl.textContent='';
-
-  var { jsPDF } = window.jspdf;
-  var wMM = cfg.w, hMM = cfg.h;
-  var isVert = ori==='verti';
-
-  // En vertical el PDF se crea con el tamaño girado
-  var pdfW = isVert ? hMM : wMM;
-  var pdfH = isVert ? wMM : hMM;
-
-  var doc = new jsPDF({ orientation: pdfW>pdfH?'landscape':'portrait', unit:'mm', format:[pdfW, pdfH] });
-
-  var marginX = pdfW * 0.05;
-  var marginY = pdfH * 0.06;
-
-  // Referencia
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(Math.max(7, Math.min(14, pdfH*0.16)));
-  doc.setTextColor(0,0,0);
-  doc.text(ref, pdfW/2, marginY + pdfH*0.12, {align:'center'});
-
-  // Barcode como imagen
-  var svgEl=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  try{
-    JsBarcode(svgEl, ean, {format:cfg.type,displayValue:false,margin:0,width:2,height:80,background:'#fff',lineColor:'#000'});
-  }catch(e){alert('Error generando barcode.');return;}
-
-  var svgData=new XMLSerializer().serializeToString(svgEl);
-  var svgBlob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
-  var url=URL.createObjectURL(svgBlob);
-
-  var canvas=document.createElement('canvas');
-  var bcWpx=400, bcHpx=120;
-  canvas.width=bcWpx;canvas.height=bcHpx;
-  var ctx=canvas.getContext('2d');
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,bcWpx,bcHpx);
-  var img=new Image();
-  img.onload=function(){
-    ctx.drawImage(img,0,0,bcWpx,bcHpx);
-    URL.revokeObjectURL(url);
-    var png=canvas.toDataURL('image/png');
-    var bcW = pdfW - marginX*2;
-    var bcH = pdfH * 0.50;
-    var bcY = marginY + pdfH*0.20;
-    doc.addImage(png,'PNG',marginX,bcY,bcW,bcH);
-    // EAN
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(Math.max(6,Math.min(10,pdfH*0.12)));
-    doc.text(ean, pdfW/2, bcY+bcH+pdfH*0.10, {align:'center'});
-    doc.save('etiqueta_'+ref.replace(/[^a-zA-Z0-9]/g,'_')+'.pdf');
-  };
-  img.onerror=function(){alert('Error al generar la imagen del barcode.');};
-  var img2=new Image();
-  img2.onload=function(){ctx.drawImage(img2,0,0,bcWpx,bcHpx);img.src=canvas.toDataURL('image/png');URL.revokeObjectURL(url);};
-  img2.onerror=function(){img.src=canvas.toDataURL('image/png');};
-  img2.src=url;
+  var err=validate(ean,cfg.type);if(err){errEl.textContent=err;return;}errEl.textContent='';
+  var {jsPDF}=window.jspdf;
+  var pW=cfg.w, pH=cfg.h;
+  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:[pW,pH]});
+  var mX=pW*0.02, mY=pH*0.02;
+  var innerW=pW-mX*2, innerH=pH-mY*2;
+  var refH=innerH*0.14; var eanH=innerH*0.12; var bcH=innerH*0.72; var bcW=innerW*0.96;
+  var bcX=mX+(innerW-bcW)/2;
+  var fsRef=Math.max(5,Math.min(12,pH*0.13));
+  var fsEan=Math.max(4,Math.min(9,pH*0.10));
+  function buildPage(pageDoc){
+    if(ori==='verti'){
+      pageDoc.saveGraphicsState();
+      var cx=pW/2, cy=pH/2;
+      pageDoc.setCurrentTransformationMatrix(0,1,-1,0,cx+cy,cy-cx);
+    }
+    pageDoc.setFont('helvetica','bold'); pageDoc.setFontSize(fsRef); pageDoc.setTextColor(0,0,0);
+    pageDoc.text(ref,pW/2,mY+refH*0.75,{align:'center'});
+    return new Promise(function(resolve){
+      bcToPNG(ean,cfg.type,Math.round(bcW*10),Math.round(bcH*10),function(png){
+        if(png){ pageDoc.addImage(png,'PNG',bcX,mY+refH,bcW,bcH); }
+        pageDoc.setFont('helvetica','normal'); pageDoc.setFontSize(fsEan);
+        pageDoc.text(ean,pW/2,mY+refH+bcH+eanH*0.85,{align:'center'});
+        if(ori==='verti') pageDoc.restoreGraphicsState();
+        resolve();
+      });
+    });
+  }
+  buildPage(doc).then(function(){
+    for(var i=1;i<copies;i++){ doc.addPage([pW,pH]); (function(d){buildPage(d);})(doc); }
+    setTimeout(function(){ doc.save('etiqueta_'+ref.replace(/[^a-zA-Z0-9\-_]/g,'_')+'.pdf'); },copies>1?copies*80:0);
+  });
 }
 
 function printRoll(){
-  var ref=document.getElementById('r-ref').value.trim();
-  var ean=document.getElementById('r-ean').value.trim();
-  if(!ref||!ean){alert('Completa la referencia y el código antes de imprimir.');return;}
-  var err=validateRoll(ean,getRollConfig().type);
-  if(err){document.getElementById('r-err').textContent=err;return;}
-  document.body.className='printing-roll';
-  window.print();
-  setTimeout(function(){document.body.className='';},600);
+  var ref=document.getElementById('r-ref').value.trim(),ean=document.getElementById('r-ean').value.trim();
+  if(!ref||!ean){alert('Completa referencia y código.');return;}
+  var e=validate(ean,getRollCfg().type);if(e){document.getElementById('r-err').textContent=e;return;}
+  document.body.className='printing-roll';window.print();setTimeout(function(){document.body.className='';},600);
 }
 
-// Init
+/* Init */
 renderSheet();
 onSizeChange();
+loadMaestro(false);
 </script>
 </body>
 </html>
