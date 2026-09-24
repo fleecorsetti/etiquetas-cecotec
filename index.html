@@ -622,26 +622,26 @@ function downloadRollPDF(){
   var bcX=mX+(innerW-bcW)/2;
   var fsRef=Math.max(5,Math.min(12,rH*0.13));
   var fsEan=Math.max(4,Math.min(9,rH*0.10));
-  function buildPage(pageDoc){
-    /* Rotar 90° siempre: trasladar origen al centro, rotar, volver */
-    pageDoc.saveGraphicsState();
-    var cx=pW/2, cy=pH/2;
-    pageDoc.setCurrentTransformationMatrix(0,1,-1,0,cx+cy,cy-cx);
-    pageDoc.setFont('helvetica','bold'); pageDoc.setFontSize(fsRef); pageDoc.setTextColor(0,0,0);
-    pageDoc.text(ref,rW/2,mY+refH*0.75,{align:'center'});
-    return new Promise(function(resolve){
-      bcToPNG(ean,cfg.type,Math.round(bcW*10),Math.round(bcH*10),function(png){
-        if(png){ pageDoc.addImage(png,'PNG',bcX,mY+refH,bcW,bcH); }
-        pageDoc.setFont('helvetica','normal'); pageDoc.setFontSize(fsEan);
-        pageDoc.text(ean,rW/2,mY+refH+bcH+eanH*0.85,{align:'center'});
-        pageDoc.restoreGraphicsState();
-        resolve();
-      });
-    });
-  }
-  buildPage(doc).then(function(){
-    for(var i=1;i<copies;i++){ doc.addPage([pW,pH]); (function(d){buildPage(d);})(doc); }
-    setTimeout(function(){ doc.save('etiqueta_'+ref.replace(/[^a-zA-Z0-9\-_]/g,'_')+'.pdf'); },copies>1?copies*80:0);
+  /* Generar el PNG del barcode una sola vez y reutilizarlo en todas las páginas */
+  bcToPNG(ean, cfg.type, Math.round(bcW*10), Math.round(bcH*10), function(png){
+    function buildPage(){
+      /* Rotar 90° siempre: trasladar origen al centro, rotar, volver */
+      doc.saveGraphicsState();
+      var cx=pW/2, cy=pH/2;
+      doc.setCurrentTransformationMatrix(0,1,-1,0,cx+cy,cy-cx);
+      doc.setFont('helvetica','bold'); doc.setFontSize(fsRef); doc.setTextColor(0,0,0);
+      doc.text(ref, rW/2, mY+refH*0.75, {align:'center'});
+      if(png){ doc.addImage(png,'PNG',bcX,mY+refH,bcW,bcH); }
+      doc.setFont('helvetica','normal'); doc.setFontSize(fsEan);
+      doc.text(ean, rW/2, mY+refH+bcH+eanH*0.85, {align:'center'});
+      doc.restoreGraphicsState();
+    }
+    buildPage(); /* primera página ya creada por jsPDF */
+    for(var i=1; i<copies; i++){
+      doc.addPage([pW, pH]);
+      buildPage();
+    }
+    doc.save('etiqueta_'+ref.replace(/[^a-zA-Z0-9\-_]/g,'_')+'.pdf');
   });
 }
 
