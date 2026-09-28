@@ -667,32 +667,55 @@ function printRoll(){
   var cfg=getRollCfg();
   var e=validate(ean,cfg.type);if(e){document.getElementById('r-err').textContent=e;return;}
 
-  /* Ajustar el label a las dimensiones exactas en horizontal (ancho > alto) */
-  var wMm=cfg.w, hMm=cfg.h; /* 90×50 para DUN-14 */
-  var lbl=document.getElementById('roll-label');
+  var wMm=cfg.w, hMm=cfg.h;
+  /* Generar PNG del barcode */
   var wPx=Math.round(wMm*PX), hPx=Math.round(hMm*PX);
+  var bcH=Math.round(hPx*0.65);
+  var canvas=document.createElement('canvas');
+  canvas.width=wPx; canvas.height=bcH;
   var barW=Math.max(1.0,wPx/120);
-  var bcH=Math.round(hPx*0.75);
-  /* Re-renderizar barcode con dimensiones horizontales exactas */
-  try{
-    JsBarcode('#rl-bc',ean,{format:cfg.type,displayValue:false,margin:0,width:barW,height:bcH,background:'#fff',lineColor:'#000'});
-    var svg=document.getElementById('rl-bc');
-    svg.setAttribute('width',wPx+'px'); svg.setAttribute('height',bcH+'px');
-  }catch(ex){}
-  /* Forzar dimensiones del label en mm para impresión */
-  var styleId='roll-print-style';
-  var old=document.getElementById(styleId);if(old)old.remove();
-  var s=document.createElement('style');s.id=styleId;
-  s.textContent='@media print{ @page{size:'+wMm+'mm '+hMm+'mm;margin:0} body.printing-roll #roll-label{width:'+wMm+'mm!important;height:'+hMm+'mm!important} }';
-  document.head.appendChild(s);
+  try{ JsBarcode(canvas,ean,{format:cfg.type,displayValue:false,margin:0,width:barW,height:bcH,background:'#ffffff',lineColor:'#000000'}); }
+  catch(ex){ alert('Error generando código de barras: '+ex.message); return; }
+  var bcDataUrl=canvas.toDataURL('image/png');
 
-  document.body.className='printing-roll';
-  window.print();
-  setTimeout(function(){
-    document.body.className='';
-    var el=document.getElementById(styleId);if(el)el.remove();
-    renderRoll();
-  },800);
+  /* Tamaños de fuente proporcionales */
+  var refFontPt=Math.round(hMm*0.22)+'pt';
+  var eanFontPt=Math.round(hMm*0.16)+'pt';
+
+  /* Construir HTML mínimo para el iframe */
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    +'<style>'
+    +'@page{size:'+wMm+'mm '+hMm+'mm;margin:0}'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +'html,body{width:'+wMm+'mm;height:'+hMm+'mm;overflow:hidden;background:#fff}'
+    +'body{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5mm}'
+    +'.ref{font-family:Arial,sans-serif;font-weight:bold;font-size:'+refFontPt+';color:#000;text-align:center;line-height:1.1;width:100%;margin-bottom:0.5mm}'
+    +'.bc{flex:1;width:100%;display:flex;align-items:center;justify-content:center;min-height:0}'
+    +'.bc img{display:block;width:100%;height:100%;object-fit:fill}'
+    +'.ean{font-family:Arial,sans-serif;font-size:'+eanFontPt+';color:#000;text-align:center;line-height:1.1;width:100%;margin-top:0.5mm}'
+    +'</style>'
+    +'</head><body>'
+    +'<div class="ref">'+ref+'</div>'
+    +'<div class="bc"><img src="'+bcDataUrl+'"/></div>'
+    +'<div class="ean">'+ean+'</div>'
+    +'</body></html>';
+
+  /* Imprimir via iframe oculto */
+  var ifrId='zebra-print-iframe';
+  var old=document.getElementById(ifrId); if(old) old.remove();
+  var ifr=document.createElement('iframe');
+  ifr.id=ifrId;
+  ifr.style.cssText='position:fixed;left:-9999px;top:-9999px;width:'+wMm+'mm;height:'+hMm+'mm;border:none;visibility:hidden;';
+  document.body.appendChild(ifr);
+  var doc=ifr.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+  ifr.onload=function(){
+    setTimeout(function(){
+      ifr.contentWindow.focus();
+      ifr.contentWindow.print();
+      setTimeout(function(){ ifr.remove(); },1500);
+    },200);
+  };
 }
 
 /* Init */
