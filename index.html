@@ -137,27 +137,12 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
   body.printing-a4 .lc { border: none !important; }
 
   body.printing-roll .section-a4 { display: none !important; }
-  body.printing-roll .roll-wrap { padding: 0 !important; margin: 0 !important; }
+  body.printing-roll .roll-wrap { padding: 0 !important; margin: 0 !important; display: block !important; }
   body.printing-roll .roll-panel { display: none !important; }
   body.printing-roll .roll-preview-box { margin: 0 !important; padding: 0 !important; gap: 0 !important; }
   body.printing-roll .roll-preview-box h3 { display: none !important; }
-  body.printing-roll .preview-frame {
-    position: fixed !important; top: 0 !important; left: 0 !important;
-    width: 100vw !important; height: 100vh !important;
-    display: flex !important; align-items: center !important; justify-content: center !important;
-    margin: 0 !important; padding: 0 !important;
-  }
-  body.printing-roll #roll-label {
-    border: none !important; box-shadow: none !important;
-    transform: none !important;
-    width: 100vw !important; height: 100vh !important;
-    margin: 0 !important; padding: 3mm !important;
-    display: flex !important; flex-direction: column !important;
-    align-items: stretch !important; justify-content: space-between !important;
-  }
-  body.printing-roll #roll-label .rl-bc svg {
-    width: 100% !important; height: 100% !important;
-  }
+  body.printing-roll .preview-frame { display: block !important; margin: 0 !important; padding: 0 !important; }
+  body.printing-roll #roll-label { border: none !important; box-shadow: none !important; transform: none !important; padding: 1mm !important; margin: 0 !important; }
   @page { margin: 0; }
 }
 </style>
@@ -682,24 +667,31 @@ function printRoll(){
   var cfg=getRollCfg();
   var e=validate(ean,cfg.type);if(e){document.getElementById('r-err').textContent=e;return;}
 
-  /* Re-renderizar barcode en orientación horizontal para impresión:
-     ancho = dimensión larga de la etiqueta, alto = dimensión corta */
-  var wMm=Math.max(cfg.w,cfg.h), hMm=Math.min(cfg.w,cfg.h);
+  /* Ajustar el label a las dimensiones exactas en horizontal (ancho > alto) */
+  var wMm=cfg.w, hMm=cfg.h; /* 90×50 para DUN-14 */
+  var lbl=document.getElementById('roll-label');
   var wPx=Math.round(wMm*PX), hPx=Math.round(hMm*PX);
-  var bcH=Math.round(hPx*0.75);
   var barW=Math.max(1.0,wPx/120);
-  var rlSvg=document.getElementById('rl-bc');
+  var bcH=Math.round(hPx*0.75);
+  /* Re-renderizar barcode con dimensiones horizontales exactas */
   try{
     JsBarcode('#rl-bc',ean,{format:cfg.type,displayValue:false,margin:0,width:barW,height:bcH,background:'#fff',lineColor:'#000'});
-    rlSvg.setAttribute('width',wPx+'px');
-    rlSvg.setAttribute('height',bcH+'px');
+    var svg=document.getElementById('rl-bc');
+    svg.setAttribute('width',wPx+'px'); svg.setAttribute('height',bcH+'px');
   }catch(ex){}
+  /* Forzar dimensiones del label en mm para impresión */
+  var styleId='roll-print-style';
+  var old=document.getElementById(styleId);if(old)old.remove();
+  var s=document.createElement('style');s.id=styleId;
+  s.textContent='@media print{ @page{size:'+wMm+'mm '+hMm+'mm;margin:0} body.printing-roll #roll-label{width:'+wMm+'mm!important;height:'+hMm+'mm!important} }';
+  document.head.appendChild(s);
 
   document.body.className='printing-roll';
   window.print();
   setTimeout(function(){
     document.body.className='';
-    renderRoll(); /* restaurar previsualización */
+    var el=document.getElementById(styleId);if(el)el.remove();
+    renderRoll();
   },800);
 }
 
