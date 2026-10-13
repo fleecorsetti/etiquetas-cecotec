@@ -63,19 +63,19 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
 .lc.horiz { flex-direction: column; padding: 0.5mm; gap: 0; }
 .lc.horiz .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; line-height: 1.1; }
 .lc.horiz .lean { color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; line-height: 1.1; }
-.lc.horiz .lbc { width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; }
-.lc.horiz .lbc svg { display: block; width: 100% !important; height: 100% !important; }
+.lc.horiz .lbc { width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.lc.horiz .lbc svg { display: block; max-width: 100% !important; max-height: 100% !important; width: auto !important; height: auto !important; }
 
 .layout-4  .lc.horiz .lref { font-size: 14pt; } .layout-4  .lc.horiz .lean { font-size: 11pt; }
 .layout-6  .lc.horiz .lref { font-size: 12pt; } .layout-6  .lc.horiz .lean { font-size: 10pt; }
 .layout-8  .lc.horiz .lref { font-size: 11pt; } .layout-8  .lc.horiz .lean { font-size: 9pt; }
-.layout-18 .lc.horiz .lref { font-size: 9pt; } .layout-18 .lc.horiz .lean { font-size: 8pt; }
+.layout-18 .lc.horiz .lref { font-size: 9pt; }  .layout-18 .lc.horiz .lean { font-size: 8pt; }
 
 .lc.verti { padding: 0; }
 .lc.verti .rot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5mm; transform: rotate(-90deg); transform-origin: center center; }
 .lc.verti .rot .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; white-space: nowrap; }
 .lc.verti .rot .lean { color: #000; font-family: Arial, sans-serif; text-align: center; white-space: nowrap; }
-.lc.verti .rot .lbc { display: flex; justify-content: center; }
+.lc.verti .rot .lbc { display: flex; justify-content: center; overflow: hidden; }
 .lc.verti .rot .lbc svg { display: block; }
 
 .layout-4  .lc.verti .rot { width: 137mm; } .layout-4  .lc.verti .rot .lref { font-size: 13pt; } .layout-4  .lc.verti .rot .lean { font-size: 10pt; } .layout-4  .lc.verti .rot .lbc svg { width: 130mm; height: 46mm; }
@@ -185,7 +185,7 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
         <option value="4">4 etiquetas (2×2)</option>
         <option value="6">6 etiquetas (3×2)</option>
         <option value="8">8 etiquetas (2×4)</option>
-        <option value="18" selected>18 etiquetas (3×6)</option>
+        <option value="18" selected>* 18 etiquetas (3×6)</option>
       </select>
     </div>
     <div class="field"><label>ORIENTACIÓN</label>
@@ -244,7 +244,6 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
       </div>
       <div class="roll-size-info" id="r-info"><b>Estándar EAN-13</b><br>70 × 55 mm · EAN-13 (13 dígitos)</div>
       <div class="field"><label id="r-elbl">CÓDIGO EAN-13</label><input type="text" id="r-ean" placeholder="8447562411400" maxlength="14" oninput="renderRoll()"/><div class="err" id="r-err"></div></div>
-      <!-- Orientación fija horizontal en pantalla; el PDF rota 90° para Zebra -->
       <input type="hidden" id="r-ori" value="horiz"/>
       <div class="field"><label>COPIAS A IMPRIMIR</label>
         <input type="number" id="r-copies" value="1" min="1" max="999" style="width:100px;"/>
@@ -263,12 +262,11 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
    MAESTRO DE REFERENCIAS (Google Sheets CSV)
    ========================================================= */
 var SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQvcTx23rNZEx9CPCB1mLXhTu6TptOp8LD6t-YztnW2QcVTRtT_wc41Q0_QlgoSDipqmfZ5vlvGH7jU/pub?gid=0&single=true&output=csv';
-var maestro = []; /* [{ref, ean13, dun14}] */
+var maestro = [];
 
 function parseCSV(text){
   var lines = text.trim().split(/\r?\n/);
   var result = [];
-  /* Detectar cabecera */
   var start = 0;
   if(lines[0] && /referencia/i.test(lines[0])) start = 1;
   for(var i = start; i < lines.length; i++){
@@ -289,8 +287,6 @@ function loadMaestro(manual){
   btn.disabled = true;
   status.textContent = '⏳ Actualizando maestro…';
   count.style.display = 'none';
-
-  /* Añadir timestamp para evitar caché del navegador */
   var url = SHEET_CSV_URL + '&_t=' + Date.now();
   fetch(url)
     .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
@@ -361,14 +357,12 @@ function acSelectA4(i){
   var m = acA4Items[i];
   if(!m) return;
   document.getElementById('iref').value = m.ref;
-  /* Respetar el tipo que el usuario tiene seleccionado */
   var tipoActual = document.getElementById('itype').value;
   if(tipoActual === 'ITF14' && m.dun14 && m.dun14.length===14){
     document.getElementById('iean').value = m.dun14;
   } else if(tipoActual === 'EAN13' && m.ean13){
     document.getElementById('iean').value = m.ean13;
   } else if(m.ean13){
-    /* fallback: si no hay código para el tipo seleccionado, usar EAN13 */
     document.getElementById('itype').value = 'EAN13';
     document.getElementById('iean').value = m.ean13;
     updateType();
@@ -399,7 +393,6 @@ function acSelectRoll(i){
   if(!m) return;
   document.getElementById('r-ref').value = m.ref;
   var cfg = getRollCfg();
-  /* Si tamaño actual es DUN-14 y hay dun14, usarlo */
   if(cfg.type==='ITF14' && m.dun14 && m.dun14.length===14){
     document.getElementById('r-ean').value = m.dun14;
   } else if(m.ean13){
@@ -444,11 +437,27 @@ function validate(c,t){
 
 /* =========================================================
    A4
+   =========================================================
+   BC: parámetros JsBarcode por orientación y layout.
+   width  = grosor de barra (px) — reducido para evitar desbordamiento
+   height = altura de barras (px) — ajustado para caber en la celda
    ========================================================= */
 var queue=[],currentLayout=18,totalSlots=18;
+
+/* ── AJUSTE CLAVE: valores reducidos para que el código quepa en la celda ── */
 var BC={
-  horiz:{4:{w:2.6,h:130},6:{w:2.0,h:110},8:{w:2.6,h:75},18:{w:1.5,h:44}},
-  verti:{4:{w:2.6,h:380},6:{w:2.0,h:380},8:{w:2.0,h:185},18:{w:1.3,h:120}}
+  horiz:{
+    4:  {w:2.2, h:90},   /* 2×2: celda ~137×137mm → barcode más ancho, altura moderada */
+    6:  {w:1.6, h:70},   /* 3×2: celda ~90×137mm  → ancho limitado, altura recortada  */
+    8:  {w:2.0, h:52},   /* 2×4: celda ~137×65mm  → altura muy reducida              */
+    18: {w:1.1, h:30}    /* 3×6: celda ~90×43mm   → mínimo para que sea legible      */
+  },
+  verti:{
+    4:  {w:2.2, h:340},
+    6:  {w:1.8, h:320},
+    8:  {w:1.8, h:160},
+    18: {w:1.1, h:100}
+  }
 };
 
 function updateType(){
@@ -588,7 +597,6 @@ function renderRoll(){
 }
 
 function bcToPNG(ean, type, pxW, pxH, cb){
-  /* Renderizar barcode en canvas directamente via JsBarcode */
   var canvas=document.createElement('canvas');
   canvas.width=pxW; canvas.height=pxH;
   try{
@@ -597,7 +605,6 @@ function bcToPNG(ean, type, pxW, pxH, cb){
       background:'#ffffff', lineColor:'#000000'});
     cb(canvas.toDataURL('image/png'));
   } catch(e){
-    /* Fallback: intentar vía SVG+Image */
     try{
       var svgEl=document.createElementNS('http://www.w3.org/2000/svg','svg');
       JsBarcode(svgEl,ean,{format:type,displayValue:false,margin:0,width:Math.max(1,pxW/120),height:pxH,background:'#fff',lineColor:'#000'});
@@ -624,13 +631,8 @@ function downloadRollPDF(){
   if(!ean){alert('Introduce el código.');return;}
   var err=validate(ean,cfg.type);if(err){errEl.textContent=err;return;}errEl.textContent='';
   var {jsPDF}=window.jspdf;
-  /* Para Zebra: el PDF tiene el tamaño físico de la etiqueta en portrait
-     pero el contenido se rota 90° dentro de la página porque la Zebra
-     interpreta el eje largo como vertical — así lo que se ve horizontal
-     en pantalla sale horizontal al salir del rollo. */
   var pW=cfg.w, pH=cfg.h;
   var doc=new jsPDF({orientation:'portrait',unit:'mm',format:[pW,pH]});
-  /* Trabajamos en el espacio rotado: el ancho útil es pH, el alto útil es pW */
   var rW=pH, rH=pW;
   var mX=0, mY=rH*0.01;
   var innerW=rW-mX*2, innerH=rH-mY*2;
@@ -638,10 +640,8 @@ function downloadRollPDF(){
   var bcX=mX+(innerW-bcW)/2;
   var fsRef=Math.max(5,Math.min(12,rH*0.13));
   var fsEan=Math.max(4,Math.min(9,rH*0.10));
-  /* Generar el PNG del barcode una sola vez y reutilizarlo en todas las páginas */
   bcToPNG(ean, cfg.type, Math.round(bcW*10), Math.round(bcH*10), function(png){
     function buildPage(){
-      /* Rotar 90° siempre: trasladar origen al centro, rotar, volver */
       doc.saveGraphicsState();
       var cx=pW/2, cy=pH/2;
       doc.setCurrentTransformationMatrix(0,1,-1,0,cx+cy,cy-cx);
@@ -652,7 +652,7 @@ function downloadRollPDF(){
       doc.text(ean, rW/2, mY+refH+bcH+eanH*0.85, {align:'center'});
       doc.restoreGraphicsState();
     }
-    buildPage(); /* primera página ya creada por jsPDF */
+    buildPage();
     for(var i=1; i<copies; i++){
       doc.addPage([pW, pH]);
       buildPage();
@@ -668,7 +668,6 @@ function printRoll(){
   var e=validate(ean,cfg.type);if(e){document.getElementById('r-err').textContent=e;return;}
 
   var wMm=cfg.w, hMm=cfg.h;
-  /* Generar PNG del barcode */
   var wPx=Math.round(wMm*PX), hPx=Math.round(hMm*PX);
   var bcH=Math.round(hPx*0.65);
   var canvas=document.createElement('canvas');
@@ -678,11 +677,9 @@ function printRoll(){
   catch(ex){ alert('Error generando código de barras: '+ex.message); return; }
   var bcDataUrl=canvas.toDataURL('image/png');
 
-  /* Tamaños de fuente proporcionales */
   var refFontPt=Math.round(hMm*0.22)+'pt';
   var eanFontPt=Math.round(hMm*0.16)+'pt';
 
-  /* Construir HTML mínimo para el iframe */
   var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'
     +'<style>'
     +'@page{size:'+wMm+'mm '+hMm+'mm;margin:0}'
@@ -700,7 +697,6 @@ function printRoll(){
     +'<div class="ean">'+ean+'</div>'
     +'</body></html>';
 
-  /* Imprimir via iframe oculto */
   var ifrId='zebra-print-iframe';
   var old=document.getElementById(ifrId); if(old) old.remove();
   var ifr=document.createElement('iframe');
