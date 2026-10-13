@@ -64,7 +64,7 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
 .lc.horiz .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; line-height: 1.1; }
 .lc.horiz .lean { color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; line-height: 1.1; }
 .lc.horiz .lbc { width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.lc.horiz .lbc svg { display: block; max-width: 100% !important; max-height: 100% !important; width: auto !important; height: auto !important; }
+.lc.horiz .lbc svg { display: block; width: 100% !important; height: 100% !important; }
 
 .layout-4  .lc.horiz .lref { font-size: 14pt; } .layout-4  .lc.horiz .lean { font-size: 11pt; }
 .layout-6  .lc.horiz .lref { font-size: 12pt; } .layout-6  .lc.horiz .lean { font-size: 10pt; }
@@ -447,10 +447,10 @@ var queue=[],currentLayout=18,totalSlots=18;
 /* ── AJUSTE CLAVE: valores reducidos para que el código quepa en la celda ── */
 var BC={
   horiz:{
-    4:  {w:2.2, h:90},   /* 2×2: celda ~137×137mm → barcode más ancho, altura moderada */
-    6:  {w:1.6, h:70},   /* 3×2: celda ~90×137mm  → ancho limitado, altura recortada  */
-    8:  {w:2.0, h:52},   /* 2×4: celda ~137×65mm  → altura muy reducida              */
-    18: {w:1.1, h:30}    /* 3×6: celda ~90×43mm   → mínimo para que sea legible      */
+    4:  {w:2.2, h:130},  /* 2×2: celda ~137×137mm */
+    6:  {w:1.6, h:110},  /* 3×2: celda ~90×137mm  */
+    8:  {w:2.0, h:75},   /* 2×4: celda ~137×65mm  */
+    18: {w:1.1, h:44}    /* 3×6: celda ~90×43mm   */
   },
   verti:{
     4:  {w:2.2, h:340},
