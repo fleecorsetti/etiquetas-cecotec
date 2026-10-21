@@ -60,10 +60,10 @@ body { font-family: Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
 #sheet.layout-18 { grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(6,1fr); padding: 10mm 5mm; }
 
 .lc { display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; border: 0.5px dashed #bbb; }
-.lc.horiz { flex-direction: column; padding: 0.5mm; gap: 0; min-height: 0; }
-.lc.horiz .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; line-height: 1.1; }
-.lc.horiz .lean { color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; line-height: 1.1; }
-.lc.horiz .lbc { width: 100%; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0 4mm; }
+.lc.horiz { flex-direction: column; padding: 0.5mm; gap: 1mm; min-height: 0; justify-content: center; }
+.lc.horiz .lref { font-weight: bold; color: #000; font-family: Arial, sans-serif; text-align: center; width: 100%; line-height: 1.1; flex-shrink: 0; }
+.lc.horiz .lean { color: #000 !important; font-family: Arial, sans-serif; text-align: center; width: 100%; line-height: 1.1; flex-shrink: 0; }
+.lc.horiz .lbc { width: 100%; flex-shrink: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0 4mm; }
 .lc.horiz .lbc svg { display: block; width: 100% !important; max-height: 100% !important; height: auto !important; }
 
 .layout-4  .lc.horiz .lref { font-size: 14pt; } .layout-4  .lc.horiz .lean { font-size: 11pt; }
